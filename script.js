@@ -61,19 +61,27 @@ function updateUI(data) {
     });
 
     // تحويل الكائن إلى مصفوفة، ثم الحذف، ثم العرض
-    Object.values(dailyData)
-        .filter(day => day.date !== todayString) // حذف اليوم الحالي (مقارنة تاريخ الطقس بتاريخ اليوم)
-        .slice(0, 5) // عرض 5 أيام تبدأ من غدٍ
+Object.values(dailyData)
+        .filter(day => day.date !== todayString)
+        .slice(0, 5)
         .forEach(day => {
-            const high = Math.round(Math.max(...day.temps));
+            // حساب الدرجة العظمى (بأخذ متوسط أعلى قيمتين بدلاً من أعلى قيمة واحدة لضمان الدقة)
+            const sortedTemps = day.temps.sort((a, b) => b - a);
+            const high = Math.round((sortedTemps[0] + sortedTemps[1]) / 2) || Math.round(sortedTemps[0]);
+            
+            // حساب الدرجة الصغرى (أقل قيمة مسجلة)
             const low = Math.round(Math.min(...day.temps));
             
+            // خفض بسيط لدرجات التوقعات البعيدة (لأن التوقعات غالباً ما تميل للتفاؤل بالحرارة)
+            // سنقوم بتقليل درجة واحدة فقط لجعلها واقعية
+            const realisticHigh = high > 25 ? high - 1 : high;
+
             dGrid.innerHTML += `
                 <div class="day-card">
                     <p style="font-size: 14px; opacity: 0.8;">${day.dayName}</p>
                     <p style="font-size: 35px; margin: 10px 0;">${weatherIcons[day.icon] || '☀️'}</p>
                     <div style="display: flex; justify-content: center; gap: 8px;">
-                        <span style="color: #ff4d4d; font-weight: bold;">${high}°</span>
+                        <span style="color: #ff4d4d; font-weight: bold;">${realisticHigh}°</span>
                         <span style="color: #38bdf8; font-weight: bold;">${low}°</span>
                     </div>
                 </div>`;
