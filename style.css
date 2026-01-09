@@ -1,57 +1,130 @@
 :root {
-    --glass: rgba(255, 255, 255, 0.2);
+    --bg-color: #0f172a;
+    --card-bg: rgba(30, 41, 59, 0.7);
+    --text-color: #f8fafc;
+    --accent-color: #38bdf8;
+    --glass-border: rgba(255, 255, 255, 0.1);
 }
+
+.light-mode {
+    --bg-color: #f1f5f9;
+    --card-bg: rgba(255, 255, 255, 0.8);
+    --text-color: #1e293b;
+    --accent-color: #0284c7;
+    --glass-border: rgba(0, 0, 0, 0.1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; transition: 0.3s ease; }
 
 body {
-    background: linear-gradient(135deg, #1e3c72, #2a5298);
-    height: 100vh; display: flex; flex-direction: column;
-    justify-content: center; align-items: center;
-    font-family: 'Segoe UI', sans-serif; margin: 0; color: white;
-    transition: background 1s ease;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.lang-switch { margin-bottom: 20px; }
-.lang-switch button {
-    background: var(--glass); border: none; color: white;
-    padding: 8px 15px; border-radius: 10px; cursor: pointer; margin: 0 5px;
+.container {
+    width: 95%;
+    max-width: 1200px;
+    height: 90vh;
+    display: flex;
+    gap: 20px;
 }
 
-.card {
-    background: var(--glass); backdrop-filter: blur(15px);
-    padding: 30px; border-radius: 30px; width: 350px;
-    text-align: center; border: 1px solid rgba(255,255,255,0.3);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+/* Sidebar */
+.sidebar {
+    flex: 1;
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    border-radius: 24px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--glass-border);
 }
 
-.search { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-input {
-    background: rgba(255,255,255,0.9); border: none; padding: 12px;
-    border-radius: 15px; width: 75%; outline: none; font-size: 16px;
+.search-box {
+    display: flex;
+    background: rgba(0,0,0,0.1);
+    border-radius: 12px;
+    padding: 5px 15px;
+    margin-bottom: 20px;
 }
 
-#search-btn {
-    background: #fff; border: none; border-radius: 15px;
-    width: 45px; height: 45px; cursor: pointer; font-size: 20px;
+.search-box input {
+    background: none; border: none; color: inherit; padding: 10px; width: 100%; outline: none;
 }
 
-.floating {
-    font-size: 100px; margin: 20px 0;
-    animation: float 3s ease-in-out infinite;
+.saved-cities { flex-grow: 1; overflow-y: auto; }
+
+.city-card {
+    background: rgba(255,255,255,0.05);
+    padding: 15px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
 }
 
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-15px); }
+/* Main Content */
+.main-content {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
-.temp { font-size: 65px; font-weight: 600; margin: 0; }
-.city { font-size: 30px; margin-top: -10px; }
-
-.details {
-    display: flex; justify-content: space-around; margin-top: 40px;
-    background: rgba(0,0,0,0.1); padding: 15px; border-radius: 20px;
+.current-weather-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(15px);
+    border-radius: 24px;
+    padding: 40px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border: 1px solid var(--glass-border);
 }
 
-.col { display: flex; align-items: center; text-align: right; }
-.col .icon { font-size: 25px; margin-left: 10px; }
-.col p { margin: 0; font-size: 14px; }
+.main-emoji { font-size: 80px; }
+#temp { font-size: 64px; font-weight: bold; }
+
+.hourly-list {
+    display: flex;
+    overflow-x: auto;
+    gap: 15px;
+    padding-bottom: 10px;
+}
+
+.hour-item {
+    min-width: 100px;
+    background: var(--card-bg);
+    padding: 15px;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.daily-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
+}
+
+.day-card {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 20px;
+    text-align: center;
+    border: 1px solid var(--glass-border);
+}
+
+.theme-toggle {
+    background: var(--accent-color);
+    border: none;
+    color: white;
+    padding: 12px;
+    border-radius: 12px;
+    cursor: pointer;
+}
