@@ -1,28 +1,43 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" id="html-tag">
 <head>
     <meta charset="UTF-8">
-    <title>تطبيق الطقس الذكي</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Weather | الطقس الذكي</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="lang-switch">
+        <button onclick="changeLang('ar')">العربية</button>
+        <button onclick="changeLang('en')">English</button>
+    </div>
+
     <div class="card">
         <div class="search">
-            <input type="text" placeholder="أدخل اسم المدينة..." spellcheck="false">
-            <button>بحث</button>
+            <input type="text" id="city-input" placeholder="ابحث عن مدينة...">
+            <button id="search-btn">🔍</button>
         </div>
-        <div class="weather">
-            <div id="weather-icon">🌡️</div>
-            <h1 class="temp">--°م</h1>
-            <h2 class="city">اكتشف الطقس</h2>
+
+        <div class="weather-box">
+            <div id="weather-icon" class="floating">🌡️</div>
+            <h1 class="temp">--°C</h1>
+            <h2 class="city">جاري التحميل...</h2>
+            <p class="description">--</p>
+            
             <div class="details">
                 <div class="col">
-                    <p class="humidity">--%</p>
-                    <p>الرطوبة</p>
+                    <span class="icon">💧</span>
+                    <div>
+                        <p class="humidity">--%</p>
+                        <p id="hum-text">الرطوبة</p>
+                    </div>
                 </div>
                 <div class="col">
-                    <p class="wind">-- كم/س</p>
-                    <p>الرياح</p>
+                    <span class="icon">🌬️</span>
+                    <div>
+                        <p class="wind">-- km/h</p>
+                        <p id="wind-text">سرعة الرياح</p>
+                    </div>
                 </div>
             </div>
         </div>
