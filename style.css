@@ -43,8 +43,21 @@ body {
 .search-box input { background: none; border: none; color: inherit; padding: 12px; width: 100%; outline: none; font-size: 15px; }
 .search-box button { background: none; border: none; color: var(--accent-color); cursor: pointer; padding: 10px; font-size: 18px; }
 
+.city-card { 
+    background: rgba(255,255,255,0.05); 
+    padding: 15px; 
+    border-radius: 15px; 
+    margin-bottom: 12px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    border: 1px solid transparent;
+}
+.city-card:hover { border-color: var(--accent-color); }
+.city-card span { cursor: pointer; flex-grow: 1; }
+
 /* Main Content */
-.main-content { flex: 2.5; display: flex; flex-direction: column; gap: 30px; overflow-y: auto; padding-left: 10px; }
+.main-content { flex: 2.5; display: flex; flex-direction: column; gap: 30px; }
 
 .current-weather-card { 
     background: var(--card-bg); 
@@ -60,28 +73,13 @@ body {
 .main-emoji { font-size: 90px; }
 #temp { font-size: 80px; font-weight: 800; color: var(--accent-color); }
 
-.weather-details { display: flex; flex-direction: column; gap: 15px; font-size: 18px; }
-
-/* الأيام القادمة */
-.daily-grid { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); 
-    gap: 15px; 
-    margin-top: 15px; 
-}
-
+.daily-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-top: 10px; }
 .day-card { 
     background: var(--card-bg); 
     padding: 20px; 
     border-radius: 20px; 
     text-align: center; 
     border: 1px solid var(--border); 
-}
-
-.day-card div span {
-    font-size: 16px;
-    font-weight: bold;
-    margin: 0 4px;
 }
 
 .theme-toggle { 
