@@ -42,30 +42,40 @@ function updateUI(data) {
     document.getElementById('currentDate').innerText = new Date().toLocaleDateString('ar-EG', {weekday: 'long', day: 'numeric', month: 'long'});
 
     // 2. تحديث توقعات 5 أيام (إصلاح الفراغ)
-    const dailyGrid = document.getElementById('dailyGrid');
-    dailyGrid.innerHTML = '';
-    
-    // منطق جديد: نأخذ قراءة واحدة كل 8 قراءات (لأن API يعطي قراءة كل 3 ساعات)
-    // 8 قراءات * 3 ساعات = 24 ساعة (يوم كامل)
-    const forecastList = data.list;
-    for (let i = 0; i < forecastList.length; i += 8) {
-        const dayData = forecastList[i];
-        const date = new Date(dayData.dt * 1000);
-        
-        // بناء كارت اليوم
-        const dayCard = document.createElement('div');
-        dayCard.className = 'day-card';
-        dayCard.innerHTML = `
-            <p style="font-weight:bold; margin-bottom:8px">${date.toLocaleDateString('ar-EG', {weekday: 'short'})}</p>
-            <p style="font-size:30px; margin:5px 0">${weatherIcons[dayData.weather[0].main] || '☀️'}</p>
-            <p style="font-size:18px"><b>${Math.round(dayData.main.temp)}°</b></p>
-        `;
-        dailyGrid.appendChild(dayCard);
-        
-        // نكتفي بـ 5 أيام فقط
-        if (dailyGrid.children.length >= 5) break;
+// --- تحديث توقعات 5 أيام (مع الحرارة العليا والسفلى) ---
+const dGrid = document.getElementById('dailyGrid');
+dGrid.innerHTML = '';
+
+// تجميع البيانات حسب اليوم
+const daysData = {};
+
+data.list.forEach(item => {
+    const date = new Date(item.dt * 1000).toLocaleDateString('en-GB'); // مفتاح التاريخ
+    if (!daysData[date]) {
+        daysData[date] = {
+            temps: [],
+            icon: item.weather[0].main,
+            dayName: new Date(item.dt * 1000).toLocaleDateString('ar-EG', {weekday: 'short'})
+        };
     }
-}
+    daysData[date].temps.push(item.main.temp);
+});
+
+// عرض أول 5 أيام بعد استخراج القيم
+Object.values(daysData).slice(0, 5).forEach(day => {
+    const maxTemp = Math.round(Math.max(...day.temps)); // أعلى درجة
+    const minTemp = Math.round(Math.min(...day.temps)); // أقل درجة
+
+    dGrid.innerHTML += `
+        <div class="day-card">
+            <p style="font-size:14px; opacity:0.8">${day.dayName}</p>
+            <p style="font-size:35px; margin:10px 0">${icons[day.icon] || '☀️'}</p>
+            <div style="display: flex; justify-content: center; gap: 8px;">
+                <span style="font-weight: bold; color: #ff4d4d;">${maxTemp}°</span> 
+                <span style="font-weight: bold; color: #38bdf8;">${minTemp}°</span>
+            </div>
+        </div>`;
+});
 
 // أزرار البحث والحذف والوضع
 document.getElementById('searchBtn').onclick = () => {
