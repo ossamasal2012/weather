@@ -81,6 +81,31 @@ body {
     text-align: center; 
     border: 1px solid var(--border); 
 }
+/* تنسيق حاوية الساعات */
+.hourly-scroll {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    padding: 10px 0;
+    scrollbar-width: thin;
+}
+
+.hour-card {
+    min-width: 100px;
+    background: var(--card-bg);
+    padding: 15px;
+    border-radius: 20px;
+    text-align: center;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+/* تحسين شكل الرطوبة والرياح */
+.weather-details {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
 
 .theme-toggle { 
     margin-top: auto; 
