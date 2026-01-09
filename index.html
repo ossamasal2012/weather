@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SkyCast Pro | طقس متطور</title>
+    <title>SkyCast Pro | منصة الطقس</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -14,8 +14,7 @@
                 <input type="text" id="cityInput" placeholder="بحث عن مدينة...">
                 <button id="searchBtn"><i class="fas fa-search"></i></button>
             </div>
-            <div class="saved-cities" id="savedCities">
-                </div>
+            <div class="saved-cities" id="savedCities"></div>
             <button class="theme-toggle" id="themeToggle">
                 <i class="fas fa-moon"></i> <span>الوضع الليلي</span>
             </button>
@@ -36,20 +35,15 @@
                     <p id="description">--</p>
                 </div>
                 <div class="weather-details">
-                    <div class="detail-item">
-                        <i class="fas fa-tint"></i>
-                        <span>الرطوبة: <b id="humidity">--%</b></span>
-                    </div>
-                    <div class="detail-item">
-                        <i class="fas fa-wind"></i>
-                        <span>الرياح: <b id="windSpeed">--</b></span>
-                    </div>
+                    <div class="detail-item"><i class="fas fa-tint"></i> الرطوبة: <b id="humidity">--%</b></div>
+                    <div class="detail-item"><i class="fas fa-wind"></i> الرياح: <b id="windSpeed">--</b></div>
                 </div>
             </section>
 
-            <section class="daily-forecast">
+            <section class="daily-forecast-container">
                 <h3>توقعات الـ 5 أيام القادمة</h3>
-                <div class="daily-grid" id="dailyGrid"></div>
+                <div class="daily-grid" id="dailyGrid">
+                    </div>
             </section>
         </main>
     </div>
