@@ -1,46 +1,65 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" id="html-tag">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Weather | الطقس الذكي</title>
+    <title>SkyCast Pro | منصة الطقس المتطورة</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
-    <div class="lang-switch">
-        <button onclick="changeLang('ar')">العربية</button>
-        <button onclick="changeLang('en')">English</button>
-    </div>
-
-    <div class="card">
-        <div class="search">
-            <input type="text" id="city-input" placeholder="ابحث عن مدينة...">
-            <button id="search-btn">🔍</button>
-        </div>
-
-        <div class="weather-box">
-            <div id="weather-icon" class="floating">🌡️</div>
-            <h1 class="temp">--°C</h1>
-            <h2 class="city">جاري التحميل...</h2>
-            <p class="description">--</p>
-            
-            <div class="details">
-                <div class="col">
-                    <span class="icon">💧</span>
-                    <div>
-                        <p class="humidity">--%</p>
-                        <p id="hum-text">الرطوبة</p>
-                    </div>
-                </div>
-                <div class="col">
-                    <span class="icon">🌬️</span>
-                    <div>
-                        <p class="wind">-- km/h</p>
-                        <p id="wind-text">سرعة الرياح</p>
-                    </div>
-                </div>
+<body class="dark-mode">
+    <div class="container">
+        <aside class="sidebar">
+            <div class="search-box">
+                <input type="text" id="cityInput" placeholder="بحث عن مدينة...">
+                <button id="searchBtn"><i class="fas fa-search"></i></button>
             </div>
-        </div>
+            <div class="saved-cities" id="savedCities">
+                </div>
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i> <span>الوضع الليلي</span>
+            </button>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="location-info">
+                    <h1 id="cityName">جاري تحديد الموقع...</h1>
+                    <p id="currentDate"></p>
+                </div>
+                <div class="unit-toggle">
+                    <button class="active">°C</button>
+                </div>
+            </header>
+
+            <section class="current-weather-card">
+                <div class="weather-main">
+                    <span id="weatherEmoji" class="main-emoji">☀️</span>
+                    <h2 id="temp">--°</h2>
+                    <p id="description">صافي</p>
+                </div>
+                <div class="weather-details">
+                    <div class="detail-item">
+                        <i class="fas fa-tint"></i>
+                        <span>الرطوبة: <b id="humidity">--%</b></span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-wind"></i>
+                        <span>الرياح: <b id="windSpeed">-- كم/س</b></span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="hourly-forecast">
+                <h3>توقعات الساعات القادمة</h3>
+                <div class="hourly-list" id="hourlyList"></div>
+            </section>
+
+            <section class="daily-forecast">
+                <h3>توقعات 5 أيام</h3>
+                <div class="daily-grid" id="dailyGrid"></div>
+            </section>
+        </main>
     </div>
     <script src="script.js"></script>
 </body>
