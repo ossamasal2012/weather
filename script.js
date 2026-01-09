@@ -29,40 +29,42 @@ function updateUI(data) {
     document.getElementById('currentDate').innerText = new Date().toLocaleDateString('ar-EG', {weekday: 'long', day: 'numeric', month: 'long'});
 
     // 2. تحديث توقعات الـ 5 أيام (مع الحرارة العليا والسفلى)
-    const dGrid = document.getElementById('dailyGrid');
-    dGrid.innerHTML = '';
+// --- تحديث توقعات الـ 5 أيام القادمة بدقة ---
+const dGrid = document.getElementById('dailyGrid');
+dGrid.innerHTML = ''; // تنظيف القائمة قبل الإضافة
 
-    const dailyData = {};
+const dailyData = {};
 
-    data.list.forEach(item => {
-        // نستخدم التاريخ كمفتاح لتجميع القراءات (مثل: 09/01/2026)
-        const date = new Date(item.dt * 1000).toLocaleDateString('en-GB'); 
-        
-        if (!dailyData[date]) {
-            dailyData[date] = {
-                allTemps: [],
-                icon: item.weather[0].main,
-                name: new Date(item.dt * 1000).toLocaleDateString('ar-EG', {weekday: 'short'})
-            };
-        }
-        dailyData[date].allTemps.push(item.main.temp);
-    });
+// تجميع كل القراءات القادمة من الـ API وتصنيفها حسب اليوم
+data.list.forEach(item => {
+    const dateKey = new Date(item.dt * 1000).toLocaleDateString('en-GB'); 
+    
+    if (!dailyData[dateKey]) {
+        dailyData[dateKey] = {
+            allTemps: [],
+            icon: item.weather[0].main,
+            dayName: new Date(item.dt * 1000).toLocaleDateString('ar-EG', {weekday: 'short'})
+        };
+    }
+    // إضافة درجة الحرارة الحالية لهذه الساعة إلى قائمة درجات اليوم
+    dailyData[dateKey].allTemps.push(item.main.temp);
+});
 
-    // عرض أول 5 أيام من القائمة المجمعة
-    Object.values(dailyData).slice(0, 5).forEach(day => {
-        const high = Math.round(Math.max(...day.allTemps)); // استخراج الدرجة القصوى
-        const low = Math.round(Math.min(...day.allTemps));  // استخراج الدرجة الدنيا
+// تحويل البيانات المجمعة إلى كروت وعرضها (أول 5 أيام فقط)
+Object.values(dailyData).slice(0, 5).forEach(day => {
+    const highTemp = Math.round(Math.max(...day.allTemps)); // استخراج أعلى درجة
+    const lowTemp = Math.round(Math.min(...day.allTemps));  // استخراج أقل درجة
 
-        dGrid.innerHTML += `
-            <div class="day-card">
-                <p style="font-size:14px; opacity:0.8">${day.name}</p>
-                <p style="font-size:35px; margin:10px 0">${weatherIcons[day.icon] || '☀️'}</p>
-                <div style="display: flex; justify-content: center; gap: 8px;">
-                    <span style="color: #ff4d4d; font-weight: bold;">${high}°</span>
-                    <span style="color: #38bdf8; font-weight: bold;">${low}°</span>
-                </div>
-            </div>`;
-    });
+    dGrid.innerHTML += `
+        <div class="day-card">
+            <p style="font-size: 14px; opacity: 0.8; margin-bottom: 5px;">${day.dayName}</p>
+            <p style="font-size: 35px; margin: 10px 0;">${weatherIcons[day.icon] || '☀️'}</p>
+            <div style="display: flex; justify-content: center; gap: 10px; margin-top: 5px;">
+                <span style="color: #ff4d4d; font-weight: bold; font-size: 16px;">${highTemp}°</span>
+                <span style="color: #38bdf8; font-weight: bold; font-size: 16px;">${lowTemp}°</span>
+            </div>
+        </div>`;
+});
 }
 
 // دالة البحث عن مدينة
