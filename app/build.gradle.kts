@@ -114,11 +114,11 @@ configurations.all {
         force(
             "androidx.core:core-ktx:1.18.0",
             "androidx.core:core:1.18.0",
-            "androidx.lifecycle:lifecycle-runtime-ktx:2.9.5",
-            "androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.5",
-            "androidx.lifecycle:lifecycle-viewmodel-compose:2.9.5",
-            "androidx.lifecycle:lifecycle-runtime-compose:2.9.5",
-            "androidx.lifecycle:lifecycle-process:2.9.5",
+            "androidx.lifecycle:lifecycle-runtime-ktx:2.9.2",
+            "androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.2",
+            "androidx.lifecycle:lifecycle-viewmodel-compose:2.9.2",
+            "androidx.lifecycle:lifecycle-runtime-compose:2.9.2",
+            "androidx.lifecycle:lifecycle-process:2.9.2",
             "androidx.activity:activity-compose:1.11.0",
             "androidx.activity:activity-ktx:1.11.0",
             "androidx.activity:activity:1.11.0"
@@ -138,11 +138,11 @@ dependencies {
     // AGP 8.13.2 / compileSdk 36.
     implementation("androidx.core:core-ktx:1.18.0")
     implementation("androidx.core:core-splashscreen:1.0.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.5")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.5")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.5")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.5")
-    implementation("androidx.lifecycle:lifecycle-process:2.9.5")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.2")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.2")
+    implementation("androidx.lifecycle:lifecycle-process:2.9.2")
     implementation("androidx.activity:activity-compose:1.11.0")
 
     // --- Jetpack Compose (versions governed by the BOM) ---
