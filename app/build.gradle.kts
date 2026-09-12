@@ -103,19 +103,53 @@ android {
     }
 }
 
+// Safety net: force these exact versions across the whole dependency graph,
+// in case any transitive dependency (e.g. from play-services-location or
+// datastore) requests a newer androidx.core/lifecycle/activity release than
+// the ones this build is pinned to. Those newer releases raise the minimum
+// required compileSdk to 37 (AGP 9.2+), which this project intentionally
+// does not use — see the note in the dependencies block below.
+configurations.all {
+    resolutionStrategy {
+        force(
+            "androidx.core:core-ktx:1.18.0",
+            "androidx.core:core:1.18.0",
+            "androidx.lifecycle:lifecycle-runtime-ktx:2.9.5",
+            "androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.5",
+            "androidx.lifecycle:lifecycle-viewmodel-compose:2.9.5",
+            "androidx.lifecycle:lifecycle-runtime-compose:2.9.5",
+            "androidx.lifecycle:lifecycle-process:2.9.5",
+            "androidx.activity:activity-compose:1.11.0",
+            "androidx.activity:activity-ktx:1.11.0",
+            "androidx.activity:activity:1.11.0"
+        )
+    }
+}
+
 dependencies {
     // --- Core / Lifecycle ---
-    implementation("androidx.core:core-ktx:1.19.0")
+    // NOTE ON VERSIONS: androidx.core 1.19.0 and androidx.lifecycle 2.11.0+
+    // raised their minimum required compileSdk to 37, which in turn requires
+    // Android Gradle Plugin 9.2+. AGP 9.x switches to a new DSL that is
+    // incompatible with the separate org.jetbrains.kotlin.android plugin used
+    // here, so rather than migrating the whole build to that new toolchain,
+    // these libraries are deliberately pinned just before that jump — fully
+    // featured, still current as of mid-2026, and verified compatible with
+    // AGP 8.13.2 / compileSdk 36.
+    implementation("androidx.core:core-ktx:1.18.0")
     implementation("androidx.core:core-splashscreen:1.0.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.11.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.11.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.11.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.11.0")
-    implementation("androidx.lifecycle:lifecycle-process:2.11.0")
-    implementation("androidx.activity:activity-compose:1.12.4")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.5")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.5")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.5")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.5")
+    implementation("androidx.lifecycle:lifecycle-process:2.9.5")
+    implementation("androidx.activity:activity-compose:1.11.0")
 
     // --- Jetpack Compose (versions governed by the BOM) ---
-    val composeBom = platform("androidx.compose:compose-bom:2026.08.00")
+    // Compose 1.12.0 (shipped in the 2026.08.xx BOM line) is the release that
+    // adopted compileSdk 37 — see comment above. 2026.06.00 is the newest BOM
+    // that still resolves to the pre-1.12.0 Compose stack.
+    val composeBom = platform("androidx.compose:compose-bom:2026.06.00")
     implementation(composeBom)
     androidTestImplementation(composeBom)
     implementation("androidx.compose.ui:ui")
@@ -129,7 +163,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     // --- Navigation ---
-    implementation("androidx.navigation:navigation-compose:2.9.7")
+    implementation("androidx.navigation:navigation-compose:2.9.0")
 
     // --- Networking: OkHttp for transport, kotlinx.serialization for JSON ---
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
