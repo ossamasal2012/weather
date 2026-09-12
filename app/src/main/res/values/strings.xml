@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">الطقس</string>
+
+    <!-- ===================== التنقل ===================== -->
+    <string name="nav_weather">الطقس</string>
+    <string name="nav_air_quality">جودة الهواء</string>
+    <string name="nav_details">تفاصيل متقدمة</string>
+    <string name="nav_settings">الإعدادات</string>
+
+    <!-- ===================== الشاشة الرئيسية ===================== -->
+    <string name="search_hint">ابحث عن مدينة أو منطقة…</string>
+    <string name="use_my_location">موقعي الحالي</string>
+    <string name="locating">جارٍ تحديد موقعك…</string>
+    <string name="feels_like">الشعور الحقيقي</string>
+    <string name="humidity">الرطوبة</string>
+    <string name="wind">الرياح</string>
+    <string name="wind_gusts">هبّات الرياح</string>
+    <string name="uv_index">الأشعة فوق البنفسجية</string>
+    <string name="visibility">مدى الرؤية</string>
+    <string name="pressure">الضغط الجوي</string>
+    <string name="dew_point">نقطة الندى</string>
+    <string name="cloud_cover">الغطاء السحابي</string>
+    <string name="sunrise">الشروق</string>
+    <string name="sunset">الغروب</string>
+    <string name="moonrise">شروق القمر</string>
+    <string name="moonset">غروب القمر</string>
+    <string name="daylight_duration">مدة النهار</string>
+    <string name="today">اليوم</string>
+    <string name="tomorrow">غداً</string>
+    <string name="now">الآن</string>
+    <string name="hourly_forecast">الساعات القادمة</string>
+    <string name="daily_forecast">الأيام القادمة</string>
+    <string name="next_hours_precip">الهطول خلال الساعة القادمة</string>
+    <string name="no_precip_expected">لا يُتوقع هطول خلال الساعة القادمة</string>
+    <string name="precip_probability">احتمال الهطول</string>
+    <string name="precip_amount">كمية الهطول</string>
+    <string name="high_low">الأعلى / الأدنى</string>
+    <string name="sun_and_moon">الشمس والقمر</string>
+    <string name="view_all_details">عرض كل التفاصيل</string>
+    <string name="last_updated">آخر تحديث: %1$s</string>
+
+    <!-- ===================== حالات الطقس (رموز WMO) ===================== -->
+    <string name="wc_0">صافٍ</string>
+    <string name="wc_1">صافٍ غالباً</string>
+    <string name="wc_2">غائم جزئياً</string>
+    <string name="wc_3">غائم</string>
+    <string name="wc_45">ضباب</string>
+    <string name="wc_48">ضباب متجمد</string>
+    <string name="wc_51">رذاذ خفيف</string>
+    <string name="wc_53">رذاذ متوسط</string>
+    <string name="wc_55">رذاذ كثيف</string>
+    <string name="wc_56">رذاذ متجمد خفيف</string>
+    <string name="wc_57">رذاذ متجمد كثيف</string>
+    <string name="wc_61">مطر خفيف</string>
+    <string name="wc_63">مطر متوسط</string>
+    <string name="wc_65">مطر غزير</string>
+    <string name="wc_66">مطر متجمد خفيف</string>
+    <string name="wc_67">مطر متجمد غزير</string>
+    <string name="wc_71">ثلج خفيف</string>
+    <string name="wc_73">ثلج متوسط</string>
+    <string name="wc_75">ثلج غزير</string>
+    <string name="wc_77">حبيبات ثلجية</string>
+    <string name="wc_80">زخّات مطر خفيفة</string>
+    <string name="wc_81">زخّات مطر متوسطة</string>
+    <string name="wc_82">زخّات مطر عنيفة</string>
+    <string name="wc_85">زخّات ثلجية خفيفة</string>
+    <string name="wc_86">زخّات ثلجية غزيرة</string>
+    <string name="wc_95">عاصفة رعدية</string>
+    <string name="wc_96">رعدية مع برَد خفيف</string>
+    <string name="wc_99">رعدية مع برَد غزير</string>
+    <string name="wc_unknown">غير معروف</string>
+
+    <!-- ===================== جودة الهواء ===================== -->
+    <string name="air_quality">جودة الهواء</string>
+    <string name="air_quality_index">مؤشر جودة الهواء</string>
+    <string name="aqi_us_index">المؤشر الأمريكي (US AQI)</string>
+    <string name="aqi_eu_index">المؤشر الأوروبي (EAQI)</string>
+    <string name="dominant_pollutant">الملوث الرئيسي</string>
+    <string name="pollutant_pm25">الجسيمات الدقيقة PM2.5</string>
+    <string name="pollutant_pm10">الجسيمات العالقة PM10</string>
+    <string name="pollutant_o3">الأوزون O₃</string>
+    <string name="pollutant_no2">ثاني أكسيد النيتروجين NO₂</string>
+    <string name="pollutant_so2">ثاني أكسيد الكبريت SO₂</string>
+    <string name="pollutant_co">أول أكسيد الكربون CO</string>
+    <string name="pollutant_co2">ثاني أكسيد الكربون CO₂</string>
+    <string name="pollutant_dust">الغبار</string>
+    <string name="pollutant_nh3">النشادر NH₃</string>
+    <string name="pollutant_methane">الميثان CH₄</string>
+    <string name="pollutant_aod">العمق الضوئي الهبائي</string>
+    <string name="aqi_good">جيدة</string>
+    <string name="aqi_moderate">متوسطة</string>
+    <string name="aqi_usg">غير صحية للفئات الحساسة</string>
+    <string name="aqi_unhealthy">غير صحية</string>
+    <string name="aqi_very_unhealthy">غير صحية جداً</string>
+    <string name="aqi_hazardous">خطيرة</string>
+    <string name="eaqi_good">جيدة</string>
+    <string name="eaqi_fair">مقبولة</string>
+    <string name="eaqi_moderate">متوسطة</string>
+    <string name="eaqi_poor">سيئة</string>
+    <string name="eaqi_very_poor">سيئة جداً</string>
+    <string name="eaqi_extremely_poor">سيئة للغاية</string>
+    <string name="aqi_forecast_7d">توقعات جودة الهواء لسبعة أيام</string>
+    <string name="health_advice">نصيحة صحية</string>
+    <string name="advice_good">الهواء نظيف — استمتع بأنشطتك الخارجية بلا قيود.</string>
+    <string name="advice_moderate">جودة مقبولة. الأشخاص شديدو الحساسية قد يشعرون بانزعاج بسيط.</string>
+    <string name="advice_usg">الفئات الحساسة (الأطفال، كبار السن، مرضى الجهاز التنفسي) ينبغي تقليل المجهود الخارجي المطوّل.</string>
+    <string name="advice_unhealthy">قلّل من الأنشطة الخارجية المجهدة قدر الإمكان.</string>
+    <string name="advice_very_unhealthy">تجنّب الأنشطة الخارجية. أبقِ النوافذ مغلقة إن أمكن.</string>
+    <string name="advice_hazardous">حالة طوارئ صحية — ابقَ في الداخل وتجنّب أي مجهود خارجي.</string>
+
+    <!-- ===================== البحث ===================== -->
+    <string name="search_title">البحث عن موقع</string>
+    <string name="search_empty_state">ابحث عن أي مدينة أو منطقة حول العالم</string>
+    <string name="search_no_results">لا توجد نتائج مطابقة لـ \"%1$s\"</string>
+    <string name="recent_searches">عمليات بحث سابقة</string>
+    <string name="clear_recent">مسح السجل</string>
+    <string name="searching">جارٍ البحث…</string>
+    <string name="current_location_label">الموقع الحالي</string>
+
+    <!-- ===================== نظام التحديث ===================== -->
+    <string name="update_available_title">يتوفر تحديث جديد</string>
+    <string name="update_available_message">يتوفر إصدار جديد من تطبيق الطقس (الإصدار %1$s). يرجى التحديث للمتابعة.</string>
+    <string name="update_now">تحديث الآن</string>
+    <string name="update_preparing">جارٍ التحضير…</string>
+    <string name="update_downloading">جارٍ تنزيل التحديث…</string>
+    <string name="update_downloading_percent">جارٍ التنزيل… %1$d%%</string>
+    <string name="update_installing">جارٍ فتح شاشة التثبيت…</string>
+    <string name="update_install_permission_title">إذن التثبيت مطلوب</string>
+    <string name="update_install_permission_message">للسماح للتطبيق بتثبيت التحديثات، فعّل خيار \"السماح من هذا المصدر\" لتطبيق الطقس من الإعدادات.</string>
+    <string name="update_open_settings">فتح الإعدادات</string>
+    <string name="update_download_failed">تعذّر تنزيل التحديث، تحقق من اتصالك وحاول مرة أخرى</string>
+    <string name="update_retry">إعادة المحاولة</string>
+    <string name="update_channel_name">تحديثات التطبيق</string>
+    <string name="update_channel_description">إشعارات تنزيل وتثبيت تحديثات تطبيق الطقس</string>
+
+    <!-- ===================== الإعدادات ===================== -->
+    <string name="settings_units">الوحدات</string>
+    <string name="settings_temp_unit">وحدة الحرارة</string>
+    <string name="unit_celsius">درجة مئوية (°C)</string>
+    <string name="unit_fahrenheit">فهرنهايت (°F)</string>
+    <string name="settings_wind_unit">وحدة سرعة الرياح</string>
+    <string name="unit_kmh">كم/س</string>
+    <string name="unit_ms">م/ث</string>
+    <string name="unit_mph">ميل/س</string>
+    <string name="unit_knots">عقدة</string>
+    <string name="settings_precip_unit">وحدة الهطول</string>
+    <string name="unit_mm">ملم</string>
+    <string name="unit_inch">إنش</string>
+    <string name="settings_about">عن التطبيق</string>
+    <string name="settings_version">الإصدار</string>
+    <string name="settings_data_source">مصدر البيانات</string>
+    <string name="settings_data_source_value">Open-Meteo.com</string>
+    <string name="settings_check_updates">التحقق من وجود تحديثات</string>
+    <string name="settings_up_to_date">التطبيق محدَّث لأحدث إصدار</string>
+    <string name="copyright">جميع الحقوق محفوظة لتطبيق الطقس من المطوّر العراقي أسامة 🇮🇶</string>
+
+    <!-- ===================== الأذونات والأخطاء ===================== -->
+    <string name="location_permission_title">إذن الموقع مطلوب</string>
+    <string name="location_permission_message">يحتاج التطبيق إلى إذن الموقع ليعرض طقس منطقتك تلقائياً وبدقة.</string>
+    <string name="location_permission_grant">السماح بالوصول للموقع</string>
+    <string name="location_permission_denied">تم رفض إذن الموقع. يمكنك البحث عن مدينتك يدوياً من زر البحث.</string>
+    <string name="location_services_disabled">خدمة الموقع غير مُفعّلة على جهازك</string>
+    <string name="enable_location_services">تفعيل خدمة الموقع</string>
+    <string name="error_network">تعذّر الاتصال بالإنترنت. تحقّق من اتصالك وحاول مرة أخرى</string>
+    <string name="error_generic">حدث خطأ غير متوقع</string>
+    <string name="error_location_not_found">تعذّر العثور على هذا الموقع</string>
+    <string name="retry">إعادة المحاولة</string>
+    <string name="loading">جارٍ التحميل…</string>
+
+    <!-- ===================== تفاصيل متقدمة ===================== -->
+    <string name="advanced_details_title">تفاصيل متقدمة</string>
+    <string name="advanced_details_subtitle">بيانات جوية وزراعية دقيقة لمن يريد التعمق أكثر</string>
+    <string name="section_atmosphere">الغلاف الجوي</string>
+    <string name="section_soil">التربة</string>
+    <string name="section_radiation">الإشعاع والطاقة الشمسية</string>
+    <string name="section_wind_altitude">الرياح على ارتفاعات مختلفة</string>
+    <string name="section_storm_indices">مؤشرات الاضطراب الجوي</string>
+    <string name="soil_temperature">حرارة التربة</string>
+    <string name="soil_moisture">رطوبة التربة</string>
+    <string name="surface">السطح</string>
+    <string name="depth_cm">العمق %1$d سم</string>
+    <string name="evapotranspiration">التبخّر النتحي (FAO)</string>
+    <string name="evapotranspiration_actual">التبخّر النتحي الفعلي</string>
+    <string name="shortwave_radiation">الإشعاع الشمسي قصير الموجة</string>
+    <string name="sunshine_duration">مدة سطوع الشمس</string>
+    <string name="cape_index">مؤشر الطاقة الكامنة (CAPE)</string>
+    <string name="lifted_index">مؤشر الرفع</string>
+    <string name="convective_inhibition">مؤشر التثبيط الحملي</string>
+    <string name="boundary_layer_height">ارتفاع الطبقة الحدّية</string>
+    <string name="freezing_level_height">مستوى التجمّد</string>
+    <string name="wet_bulb_temp">حرارة المقياس الرطب</string>
+    <string name="total_water_vapour">بخار الماء الكلي في العمود الجوي</string>
+    <string name="vapour_pressure_deficit">عجز الضغط البخاري</string>
+    <string name="moon_phase">طور القمر</string>
+    <string name="moon_new">محاق</string>
+    <string name="moon_waxing_crescent">هلال متزايد</string>
+    <string name="moon_first_quarter">تربيع أول</string>
+    <string name="moon_waxing_gibbous">أحدب متزايد</string>
+    <string name="moon_full">بدر</string>
+    <string name="moon_waning_gibbous">أحدب متناقص</string>
+    <string name="moon_last_quarter">تربيع أخير</string>
+    <string name="moon_waning_crescent">هلال متناقص</string>
+
+    <!-- ===================== وصولية عامة (Content descriptions) ===================== -->
+    <string name="cd_search">بحث</string>
+    <string name="cd_my_location">استخدام موقعي الحالي</string>
+    <string name="cd_back">رجوع</string>
+    <string name="cd_settings">الإعدادات</string>
+    <string name="cd_weather_icon">أيقونة حالة الطقس</string>
+    <string name="cd_close">إغلاق</string>
+</resources>
