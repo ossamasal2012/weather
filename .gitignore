@@ -1,0 +1,36 @@
+*.iml
+.gradle/
+/local.properties
+/.idea/
+.DS_Store
+/build/
+/captures/
+.externalNativeBuild/
+.cxx/
+local.properties
+
+# Android Studio
+*.apk
+*.ap_
+*.dex
+*.class
+bin/
+gen/
+out/
+
+# Gradle
+.gradle
+build/
+
+# Keystore files (never commit real signing keys)
+*.jks
+*.keystore
+!debug.keystore
+
+# The generated signing credentials folder — contains a plaintext password.
+# Copy the values you need into GitHub Secrets, then this folder should never
+# be part of the git history at all.
+/signing/
+
+# Log Files
+*.log
