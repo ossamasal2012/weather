@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Sampled directly from the app icon artwork; used as the adaptive-icon
+         background layer so cropped corners blend seamlessly with the
+         foreground on every launcher mask shape (circle, squircle, rounded
+         square, sharp square). -->
+    <color name="ic_launcher_background">#0A3B93</color>
+
+    <!-- Splash screen background (matches the deep blue of the icon so the
+         cold-start frame feels continuous with the app icon and the app's
+         own night/overcast gradients, never a jarring white flash). -->
+    <color name="splash_background">#0A3B93</color>
+</resources>
