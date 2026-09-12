@@ -2,7 +2,7 @@ name: Build and Release APK
 
 # Runs automatically on every push to main/master (exactly the "commit ->
 # automatic build" flow described in the project's update-system brief), and
-# can also be triggered manually from the Actions tab.
+# can also be triggered manually from the Actions tab..
 "on":
   push:
     branches: [ main, master ]
