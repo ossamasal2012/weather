@@ -44,8 +44,8 @@ object ApiConfig {
  * └─────────────────────────────────────────────────────────────────────┘
  */
 object UpdateConfig {
-    const val REPO_OWNER = "YOUR_GITHUB_USERNAME"
-    const val REPO_NAME = "YOUR_REPO_NAME"
+    const val REPO_OWNER = "ossamasal2012"
+    const val REPO_NAME = "weather"
 
     private const val RELEASE_TAG = "latest"
     private const val RELEASE_BASE =
