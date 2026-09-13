@@ -1,6 +1,7 @@
 package com.osama.weather.ui.theme
 
 import androidx.compose.material3.Typography
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -15,7 +16,10 @@ import com.osama.weather.R
  * Latin coverage in one family (numerals, °C/°F, city names in either
  * script). Each weight below points at the SAME file with a different
  * FontVariation, which is the standard way to use a variable font in Compose.
+ * The variationSettings overload of Font() is marked @ExperimentalTextApi by
+ * Compose itself, hence the opt-in.
  */
+@OptIn(ExperimentalTextApi::class)
 private fun cairo(weight: Int, base: FontWeight) = Font(
     resId = R.font.cairo,
     weight = base,
