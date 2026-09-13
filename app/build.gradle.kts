@@ -6,7 +6,7 @@ plugins {
 }
 
 // ---------------------------------------------------------------------------------
-// Release signing configuration.
+// Release signing configuration.,
 //
 // GitHub Actions supplies the keystore + credentials as repository secrets and
 // exports them as environment variables before running `assembleRelease` (see
