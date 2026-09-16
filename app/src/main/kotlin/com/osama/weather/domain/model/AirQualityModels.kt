@@ -8,6 +8,7 @@ data class AirQualityBundle(
     val latitude: Double,
     val longitude: Double,
     val timezone: String,
+    val utcOffsetSeconds: Int,
     val hourly: List<HourlyAirQualityEntry>
 ) {
     /** The reading closest to "now" — used for the summary card on the home screen. */
