@@ -63,6 +63,34 @@ object DateTimeUtils {
         "$hour12:$minute $marker"
     }.getOrDefault("—")
 
+    private val arabicMonthNames = mapOf(
+        1 to "يناير", 2 to "فبراير", 3 to "مارس", 4 to "أبريل",
+        5 to "مايو", 6 to "يونيو", 7 to "يوليو", 8 to "أغسطس",
+        9 to "سبتمبر", 10 to "أكتوبر", 11 to "نوفمبر", 12 to "ديسمبر"
+    )
+
+    /** "10:45 ص" — current wall-clock time at the given UTC offset, 12-hour format. */
+    fun liveClock(nowEpochSeconds: Long, utcOffsetSeconds: Int): String {
+        val dt = toLocalDateTime(nowEpochSeconds, utcOffsetSeconds)
+        val hour24 = dt.hour
+        val hour12 = when {
+            hour24 == 0 -> 12
+            hour24 > 12 -> hour24 - 12
+            else -> hour24
+        }
+        val minute = dt.minute.toString().padStart(2, '0')
+        val marker = if (hour24 < 12) "ص" else "م"
+        return "$hour12:$minute $marker"
+    }
+
+    /** "الأحد، 13 سبتمبر" — the calendar date at the given UTC offset. */
+    fun liveDate(nowEpochSeconds: Long, utcOffsetSeconds: Int): String {
+        val dt = toLocalDateTime(nowEpochSeconds, utcOffsetSeconds)
+        val dayName = arabicDayNames[dt.dayOfWeek] ?: ""
+        val month = arabicMonthNames[dt.monthValue] ?: ""
+        return "$dayName، ${dt.dayOfMonth} $month"
+    }
+
     fun nowEpochSeconds(): Long = Instant.now().epochSecond
 
     fun isSameLocalDay(epochA: Long, epochB: Long, utcOffsetSeconds: Int): Boolean =
