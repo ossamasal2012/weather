@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import com.osama.weather.ui.components.drawMoonPhase
 import androidx.compose.ui.graphics.drawscope.rotate
 import kotlin.math.abs
 import kotlin.math.cos
@@ -226,7 +227,7 @@ fun MoonWithStars(modifier: Modifier = Modifier, phaseFraction: Float, starCount
             drawCircle(Color.White.copy(alpha = alpha), radius = s.radius, center = Offset(s.x * size.width, s.y * size.height))
         }
 
-        // Moon disc with a shadow terminator positioned by the real moon_phase fraction.
+        // Real crescent/gibbous moon disc, positioned by the actual moon_phase fraction.
         val moonRadius = size.minDimension * 0.11f
         val moonCenter = Offset(size.width * 0.78f, size.height * 0.16f)
         drawCircle(
@@ -236,14 +237,7 @@ fun MoonWithStars(modifier: Modifier = Modifier, phaseFraction: Float, starCount
             ),
             radius = moonRadius * 2.6f, center = moonCenter
         )
-        drawCircle(Color(0xFFF6F1DE), radius = moonRadius, center = moonCenter)
-
-        // phaseFraction: 0/1 = new, 0.5 = full. Shift a shadow disc across the moon to fake the terminator.
-        val shadowShift = ((phaseFraction - 0.5f) * 2f).coerceIn(-1f, 1f) // -1 (new,left) .. 0 (full) .. 1 (new,right)
-        if (abs(shadowShift) > 0.02f) {
-            val shadowCenter = Offset(moonCenter.x + shadowShift * moonRadius * 1.9f, moonCenter.y)
-            drawCircle(Color(0xFF0B1230).copy(alpha = 0.94f), radius = moonRadius * 1.02f, center = shadowCenter)
-        }
+        drawMoonPhase(center = moonCenter, radius = moonRadius, phaseFraction = phaseFraction)
     }
 }
 
@@ -292,6 +286,21 @@ private fun DrawScope.drawCloudPuff(
         Offset(center.x + r * 1.15f, center.y + r * 0.28f) to r * 0.68f,
         Offset(center.x + r * 0.1f, center.y + r * 0.35f) to r * 1.05f
     )
+
+    // Soft cast shadow beneath the whole cloud, so it reads as floating above
+    // the sky rather than painted flat onto it.
+    offsets.forEach { (pos, radius) ->
+        drawCircle(
+            brush = Brush.radialGradient(
+                colors = listOf(Color.Black.copy(alpha = alpha * 0.16f), Color.Transparent),
+                center = Offset(pos.x, pos.y + radius * 0.35f), radius = radius * 1.5f
+            ),
+            radius = radius * 1.5f,
+            center = Offset(pos.x, pos.y + radius * 0.35f)
+        )
+    }
+
+    // Base tint.
     offsets.forEach { (pos, radius) ->
         drawCircle(
             brush = Brush.radialGradient(
@@ -300,6 +309,30 @@ private fun DrawScope.drawCloudPuff(
             ),
             radius = radius * 1.4f,
             center = pos
+        )
+    }
+
+    // Cooler, slightly darker underside for volume (light source from above).
+    offsets.forEach { (pos, radius) ->
+        drawCircle(
+            brush = Brush.radialGradient(
+                colors = listOf(Color(0xFF6B7C93).copy(alpha = alpha * 0.30f), Color.Transparent),
+                center = Offset(pos.x, pos.y + radius * 0.45f), radius = radius * 1.1f
+            ),
+            radius = radius * 1.1f,
+            center = Offset(pos.x, pos.y + radius * 0.45f)
+        )
+    }
+
+    // Bright highlight along the top, as if lit from above.
+    offsets.forEach { (pos, radius) ->
+        drawCircle(
+            brush = Brush.radialGradient(
+                colors = listOf(Color.White.copy(alpha = alpha * 0.35f), Color.Transparent),
+                center = Offset(pos.x - radius * 0.15f, pos.y - radius * 0.4f), radius = radius * 0.9f
+            ),
+            radius = radius * 0.9f,
+            center = Offset(pos.x - radius * 0.15f, pos.y - radius * 0.4f)
         )
     }
 }
