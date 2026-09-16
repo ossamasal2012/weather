@@ -5,20 +5,27 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
 import com.osama.weather.R
 import com.osama.weather.domain.model.DailyEntry
 import com.osama.weather.domain.model.WeatherCodeMapper
 import com.osama.weather.ui.theme.ExtraTypography
 import com.osama.weather.ui.theme.Spacing
 import com.osama.weather.ui.theme.WeatherColors
+import com.osama.weather.util.DateTimeUtils
+import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
 @Composable
@@ -29,6 +36,7 @@ fun CurrentWeatherHero(
     weatherCode: Int,
     today: DailyEntry?,
     unitSuffix: String,
+    utcOffsetSeconds: Int,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -37,11 +45,15 @@ fun CurrentWeatherHero(
     ) {
         Text(
             text = locationDisplayName,
-            style = androidx.compose.material3.MaterialTheme.typography.headlineMedium,
+            style = MaterialTheme.typography.headlineMedium,
             color = WeatherColors.OnBgPrimary,
             textAlign = TextAlign.Center,
             maxLines = 2
         )
+
+        Spacer(Spacing.xxs)
+
+        LiveLocationClock(utcOffsetSeconds = utcOffsetSeconds)
 
         Spacer(Spacing.xs)
 
@@ -54,7 +66,7 @@ fun CurrentWeatherHero(
 
         Text(
             text = stringResource(WeatherCodeMapper.stringResFor(weatherCode)),
-            style = androidx.compose.material3.MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.titleLarge,
             color = WeatherColors.OnBgSecondary
         )
 
@@ -66,14 +78,14 @@ fun CurrentWeatherHero(
         ) {
             Text(
                 text = stringResource(R.string.feels_like) + " ${apparentTemperature.roundToInt()}$unitSuffix",
-                style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyMedium,
                 color = WeatherColors.OnBgSecondary
             )
             if (today != null) {
                 Text("•", color = WeatherColors.OnBgTertiary)
                 Text(
                     text = "${today.temperatureMax.roundToInt()}$unitSuffix / ${today.temperatureMin.roundToInt()}$unitSuffix",
-                    style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = WeatherColors.OnBgSecondary
                 )
             }
@@ -81,7 +93,38 @@ fun CurrentWeatherHero(
     }
 }
 
+/**
+ * A small live clock + date for the *viewed location* (using its own UTC
+ * offset, never the device's local timezone), ticking on its own so it
+ * always reflects "now" there without needing a full weather refresh.
+ */
 @Composable
-private fun Spacer(size: androidx.compose.ui.unit.Dp) {
+private fun LiveLocationClock(utcOffsetSeconds: Int) {
+    var nowEpoch by remember(utcOffsetSeconds) { mutableStateOf(DateTimeUtils.nowEpochSeconds()) }
+
+    LaunchedEffect(utcOffsetSeconds) {
+        while (true) {
+            nowEpoch = DateTimeUtils.nowEpochSeconds()
+            delay(30_000L) // a clock display only needs minute-level freshness
+        }
+    }
+
+    Row(horizontalArrangement = Arrangement.spacedBy(Spacing.xxs), verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            text = DateTimeUtils.liveClock(nowEpoch, utcOffsetSeconds),
+            style = MaterialTheme.typography.titleMedium,
+            color = WeatherColors.OnBgSecondary
+        )
+        Text("•", color = WeatherColors.OnBgTertiary, style = MaterialTheme.typography.bodyMedium)
+        Text(
+            text = DateTimeUtils.liveDate(nowEpoch, utcOffsetSeconds),
+            style = MaterialTheme.typography.bodyMedium,
+            color = WeatherColors.OnBgTertiary
+        )
+    }
+}
+
+@Composable
+private fun Spacer(size: Dp) {
     androidx.compose.foundation.layout.Spacer(Modifier.height(size))
 }
