@@ -2,7 +2,24 @@
 # You can control the set of applied configuration files using the
 # proguardFiles setting in build.gradle.kts.
 
-# Keep line numbers for readable crash stack traces.
+# ---------------------------------------------------------------------------
+# Hardening beyond R8's defaults.
+#
+# Context for whoever reads this later: no ProGuard/R8 configuration makes an
+# Android app immune to inspection — a sufficiently motivated person can
+# always pull strings and structure out of an installed APK. What these
+# rules *do* achieve, for free, is: class/method/field names are scrambled
+# (a.b.c instead of WeatherRepository.getWeather), unused code is stripped,
+# and — with repackageclasses below — every remaining class is flattened
+# into one anonymous top-level package, so the app's real module layout
+# (data/, domain/, ui/, update/…) is not visible in a decompiler either.
+# That materially raises the effort needed to make sense of a decompile,
+# which is the realistic, honest goal here.
+# ---------------------------------------------------------------------------
+-repackageclasses ''
+-allowaccessmodification
+
+# Keep line numbers for readable crash stack traces, but hide real file names.
 -keepattributes SourceFile,LineNumberTable
 -renamesourcefileattribute SourceFile
 
