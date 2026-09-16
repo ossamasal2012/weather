@@ -1,8 +1,8 @@
 name: Build and Release APK
 
-# Runs automatically on every push to main/master (exactly the "commit ->
-# automatic build" flow described in the project's update-system brief), and
-# can also be triggered manually from the Actions tab.
+# Runs automatically on every push to main/master.
+# Can also be triggered manually from the Actions tab.
+
 "on":
   push:
     branches: [ main, master ]
@@ -26,8 +26,39 @@ jobs:
           java-version: "17"
           cache: gradle
 
+      # IMPORTANT:
+      # setup-android defaults to installing "tools platform-tools".
+      # The legacy "tools" package is no longer available from the SDK
+      # repositories used by the runner, so we explicitly disable the
+      # default package installation here.
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: ""
+
+      - name: Install required Android SDK packages
+        run: |
+          set -e
+
+          yes | sdkmanager --licenses >/dev/null || true
+
+          sdkmanager --install \
+            "platform-tools" \
+            "platforms;android-36" \
+            "build-tools;36.0.0"
+
+      - name: Verify Android SDK
+        run: |
+          set -e
+
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+
+          test -d "$ANDROID_SDK_ROOT/platforms/android-36"
+          test -d "$ANDROID_SDK_ROOT/build-tools/36.0.0"
+          test -d "$ANDROID_SDK_ROOT/platform-tools"
+
+          echo "Android SDK 36 verified successfully."
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -49,25 +80,31 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: ./gradlew assembleRelease --stacktrace
+        run: ./gradlew assembleRelease --no-daemon --stacktrace
 
       - name: Read versionCode / versionName from app/build.gradle.kts
         id: version
         run: |
           CODE=$(grep -oP '(?<=versionCode = )[0-9]+' app/build.gradle.kts | head -n1)
           NAME=$(grep -oP '(?<=versionName = ")[^"]+' app/build.gradle.kts | head -n1)
+
           if [ -z "$CODE" ] || [ -z "$NAME" ]; then
             echo "::error::Could not read versionCode/versionName from app/build.gradle.kts"
             exit 1
           fi
+
           echo "Detected versionCode=$CODE versionName=$NAME"
           echo "code=$CODE" >> "$GITHUB_OUTPUT"
           echo "name=$NAME" >> "$GITHUB_OUTPUT"
 
       - name: Stage release artifacts
         run: |
+          set -e
+
           mkdir -p release-assets
-          cp app/build/outputs/apk/release/app-release.apk release-assets/weather.apk
+
+          cp app/build/outputs/apk/release/app-release.apk \
+             release-assets/weather.apk
 
           cat > release-assets/version.json << EOF
           {
@@ -79,9 +116,20 @@ jobs:
             "published_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           }
           EOF
+
           cat release-assets/version.json
 
-      - name: Publish "latest" release (replaces the previous one automatically)
+      - name: Verify release APK
+        run: |
+          set -e
+
+          test -f release-assets/weather.apk
+          test -s release-assets/weather.apk
+
+          echo "APK created successfully:"
+          ls -lh release-assets/weather.apk
+
+      - name: Publish "latest" release
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -89,7 +137,7 @@ jobs:
           name: "أحدث إصدار — v${{ steps.version.outputs.name }} (${{ steps.version.outputs.code }})"
           body: |
             تحديث تلقائي منشور بواسطة GitHub Actions.
-            هذا الإصدار يستبدل تلقائياً أي إصدار سابق بنفس الوسم `latest`،
+            هذا الإصدار يستبدل تلقائياً أي إصدار سابق بنفس الوسم `latest`.
             لذلك رابط التحديث داخل التطبيق يبقى ثابتاً دائماً.
           files: |
             release-assets/weather.apk
