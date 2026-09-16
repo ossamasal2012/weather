@@ -73,8 +73,8 @@ class UpdateDownloadManager(
 
     /** Starts (or resumes-by-restarting) the update download and persists it so it survives process death. */
     suspend fun enqueueDownload(apkUrl: String, targetVersionCode: Int): Long {
-        val fileName = "al-taqs-weather-update-v$targetVersionCode.apk"
-        // Clear out any stale partial file from a previous attempt at this same version.
+        val fileName = UpdateConfig.DOWNLOADED_APK_FILENAME
+        // Clear out any stale file from a previous update attempt.
         runCatching {
             context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
                 ?.resolve(fileName)
