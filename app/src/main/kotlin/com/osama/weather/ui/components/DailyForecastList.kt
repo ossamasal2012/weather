@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -135,7 +136,10 @@ private fun DailyRow(
                         .clip(RoundedCornerShape(50))
                         .background(WeatherColors.GlassSurfaceStrong)
                 )
-                // Floating min→max segment for this day
+                // Floating min→max segment for this day: blue on the cool
+                // (min) side, yellow on the warm (max) side — the segment's
+                // own frame is forced LTR above, so left is always min and
+                // right is always max, matching this gradient direction.
                 Box(
                     modifier = Modifier
                         .offset(x = segmentOffset)
@@ -144,7 +148,7 @@ private fun DailyRow(
                         .clip(RoundedCornerShape(50))
                         .background(
                             Brush.horizontalGradient(
-                                listOf(WeatherColors.Accent.copy(alpha = 0.55f), WeatherColors.Accent)
+                                listOf(Color(0xFF4FC3F7), Color(0xFFFFC857))
                             )
                         )
                 )
