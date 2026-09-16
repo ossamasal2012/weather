@@ -124,7 +124,7 @@ class LocationHelper(private val context: Context) {
                     id = -1L,
                     name = normalizeArabicAdminName(
                         address.locality ?: address.subAdminArea ?: address.adminArea ?: address.countryName.orEmpty()
-                    ),
+                    ).orEmpty(),
                     admin1 = normalizeArabicAdminName(address.adminArea),
                     admin2 = normalizeArabicAdminName(address.subAdminArea),
                     country = address.countryName,
