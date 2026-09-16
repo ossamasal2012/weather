@@ -29,7 +29,12 @@ class LocationHelper(private val context: Context) {
             ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) ==
             PackageManager.PERMISSION_GRANTED
 
-    /** A fresh, high-accuracy GPS fix — the brief explicitly wants precise, not coarse, positioning. */
+    /**
+     * Resolves the device's current coordinates, favoring speed when a
+     * recent fix is already cached (e.g. switching back to "my location"
+     * after viewing a searched city) while still guaranteeing a precise fix
+     * when nothing recent is available.
+     */
     @SuppressLint("MissingPermission")
     suspend fun getCurrentFix(): Result<Pair<Double, Double>> {
         if (!hasLocationPermission()) return Result.failure(SecurityException("Location permission not granted"))
@@ -37,29 +42,52 @@ class LocationHelper(private val context: Context) {
         return runCatching {
             withContext(Dispatchers.IO) {
                 val client = LocationServices.getFusedLocationProviderClient(context)
-                val cancellationSource = CancellationTokenSource()
-                val request = CurrentLocationRequest.Builder()
-                    .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
-                    .setMaxUpdateAgeMillis(60_000L)
-                    .build()
 
-                val location = suspendCancellableCoroutine { continuation ->
-                    client.getCurrentLocation(request, cancellationSource.token)
-                        .addOnSuccessListener { location ->
-                            if (location != null) {
-                                continuation.resume(location)
-                            } else {
-                                continuation.resumeWithException(IllegalStateException("Null location fix"))
+                // Fast path: Play Services keeps a recent fix cached virtually
+                // for free — if it's fresh enough, use it immediately instead
+                // of waiting on a brand new GPS/network request.
+                val cached = runCatching {
+                    suspendCancellableCoroutine<android.location.Location?> { continuation ->
+                        client.lastLocation
+                            .addOnSuccessListener { continuation.resume(it) }
+                            .addOnFailureListener { continuation.resume(null) }
+                    }
+                }.getOrNull()
+
+                val cachedIsFresh = cached != null &&
+                    (System.currentTimeMillis() - cached.time) < CACHED_FIX_MAX_AGE_MILLIS
+
+                val location = if (cachedIsFresh) {
+                    cached!!
+                } else {
+                    val cancellationSource = CancellationTokenSource()
+                    val request = CurrentLocationRequest.Builder()
+                        .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
+                        .setMaxUpdateAgeMillis(60_000L)
+                        .build()
+
+                    suspendCancellableCoroutine { continuation ->
+                        client.getCurrentLocation(request, cancellationSource.token)
+                            .addOnSuccessListener { fresh ->
+                                if (fresh != null) {
+                                    continuation.resume(fresh)
+                                } else {
+                                    continuation.resumeWithException(IllegalStateException("Null location fix"))
+                                }
                             }
-                        }
-                        .addOnFailureListener { e -> continuation.resumeWithException(e) }
+                            .addOnFailureListener { e -> continuation.resumeWithException(e) }
 
-                    continuation.invokeOnCancellation { cancellationSource.cancel() }
+                        continuation.invokeOnCancellation { cancellationSource.cancel() }
+                    }
                 }
 
                 location.latitude to location.longitude
             }
         }
+    }
+
+    private companion object {
+        const val CACHED_FIX_MAX_AGE_MILLIS = 5 * 60 * 1000L // 5 minutes
     }
 
     /**
@@ -94,12 +122,11 @@ class LocationHelper(private val context: Context) {
 
                 GeoLocation(
                     id = -1L,
-                    name = address.locality
-                        ?: address.subAdminArea
-                        ?: address.adminArea
-                        ?: address.countryName.orEmpty(),
-                    admin1 = address.adminArea,
-                    admin2 = address.subAdminArea,
+                    name = normalizeArabicAdminName(
+                        address.locality ?: address.subAdminArea ?: address.adminArea ?: address.countryName.orEmpty()
+                    ),
+                    admin1 = normalizeArabicAdminName(address.adminArea),
+                    admin2 = normalizeArabicAdminName(address.subAdminArea),
                     country = address.countryName,
                     countryCode = address.countryCode,
                     latitude = latitude,
@@ -109,4 +136,26 @@ class LocationHelper(private val context: Context) {
                 )
             }.getOrDefault(fallback)
         }
+
+    /**
+     * The device Geocoder sometimes returns administrative names with the
+     * unit word trailing — "بابل محافظة" — following an English-style word
+     * order ("Babil Governorate") rather than correct Arabic ("محافظة بابل").
+     * This detects a small set of common Arabic administrative-unit words at
+     * the *end* of the string and moves them to the front. Names that are
+     * already correctly ordered, or that don't end in one of these words,
+     * pass through unchanged.
+     */
+    private fun normalizeArabicAdminName(raw: String?): String? {
+        if (raw.isNullOrBlank()) return raw
+        val trimmed = raw.trim()
+        val unitWords = listOf("محافظة", "منطقة", "إقليم", "ولاية", "مقاطعة", "إمارة")
+        for (word in unitWords) {
+            if (trimmed.endsWith(" $word")) {
+                val name = trimmed.removeSuffix(" $word").trim()
+                if (name.isNotEmpty()) return "$word $name"
+            }
+        }
+        return trimmed
+    }
 }
