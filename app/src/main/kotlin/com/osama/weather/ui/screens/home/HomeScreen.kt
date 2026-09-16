@@ -173,7 +173,8 @@ fun HomeScreen(
                             temperatureMax = UnitConverters.temperature(todayConverted.temperatureMax, tempUnit),
                             temperatureMin = UnitConverters.temperature(todayConverted.temperatureMin, tempUnit)
                         ),
-                        unitSuffix = unitSuffix
+                        unitSuffix = unitSuffix,
+                        utcOffsetSeconds = weather.utcOffsetSeconds
                     )
 
                     Spacer(modifier = Modifier.height(Spacing.xl))
@@ -185,8 +186,13 @@ fun HomeScreen(
 
                     Spacer(modifier = Modifier.height(Spacing.md))
 
+                    val nowEpoch = DateTimeUtils.parseEpochSeconds(weather.current.time, weather.utcOffsetSeconds)
+                    val upcomingHours = weather.hourly
+                        .filter { it.epochSeconds > nowEpoch }
+                        .take(24)
+
                     HourlyForecastRow(
-                        hours = weather.hourly.take(24),
+                        hours = upcomingHours,
                         utcOffsetSeconds = weather.utcOffsetSeconds,
                         unitSuffix = unitSuffix
                     )
