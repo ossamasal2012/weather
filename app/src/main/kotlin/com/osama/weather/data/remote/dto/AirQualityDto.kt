@@ -9,6 +9,7 @@ data class AirQualityResponseDto(
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,
     val timezone: String? = null,
+    @SerialName("utc_offset_seconds") val utcOffsetSeconds: Int = 0,
     val hourly: AirQualityHourlyDto? = null
 )
 
