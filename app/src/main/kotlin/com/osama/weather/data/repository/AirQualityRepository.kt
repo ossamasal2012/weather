@@ -15,16 +15,17 @@ class AirQualityRepository(
                 latitude = dto.latitude,
                 longitude = dto.longitude,
                 timezone = dto.timezone.orEmpty(),
-                hourly = dto.hourly?.toDomainList() ?: emptyList()
+                utcOffsetSeconds = dto.utcOffsetSeconds,
+                hourly = dto.hourly?.toDomainList(dto.utcOffsetSeconds) ?: emptyList()
             )
         }
 
-    private fun AirQualityHourlyDto.toDomainList(): List<HourlyAirQualityEntry> =
+    private fun AirQualityHourlyDto.toDomainList(utcOffsetSeconds: Int): List<HourlyAirQualityEntry> =
         time.indices.map { i ->
             val iso = time[i]
             HourlyAirQualityEntry(
                 time = iso,
-                epochSeconds = DateTimeUtils.parseEpochSeconds(iso, 0),
+                epochSeconds = DateTimeUtils.parseEpochSeconds(iso, utcOffsetSeconds),
                 pm10 = pm10.at(i),
                 pm2_5 = pm2_5.at(i),
                 carbonMonoxide = carbonMonoxide.at(i),
