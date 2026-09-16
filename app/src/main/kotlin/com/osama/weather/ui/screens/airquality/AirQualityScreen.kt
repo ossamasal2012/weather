@@ -172,9 +172,14 @@ fun AirQualityScreen(homeViewModel: HomeViewModel, onBack: () -> Unit) {
                     color = WeatherColors.OnBgSecondary
                 )
                 Spacer(modifier = Modifier.height(Spacing.sm))
+                val nowEpoch = DateTimeUtils.nowEpochSeconds()
+                val upcomingAqi = airQuality.hourly
+                    .filter { it.epochSeconds > nowEpoch }
+                    .filterIndexed { i, _ -> i % 6 == 0 }
+                    .take(28)
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
-                    items(airQuality.hourly.filterIndexed { i, _ -> i % 6 == 0 }.take(28)) { entry ->
-                        ForecastAqiItem(entry, airQuality.timezone)
+                    items(upcomingAqi) { entry ->
+                        ForecastAqiItem(entry, airQuality.utcOffsetSeconds)
                     }
                 }
             }
@@ -235,12 +240,12 @@ private fun AqiBar(value: Int, maxValue: Int) {
 }
 
 @Composable
-private fun ForecastAqiItem(entry: HourlyAirQualityEntry, timezone: String) {
+private fun ForecastAqiItem(entry: HourlyAirQualityEntry, utcOffsetSeconds: Int) {
     val aqi = entry.usAqi ?: return
     val category = UsAqiCategory.fromValue(aqi)
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(56.dp)) {
         Text(
-            text = DateTimeUtils.hourLabel(entry.epochSeconds, 0),
+            text = DateTimeUtils.hourLabel(entry.epochSeconds, utcOffsetSeconds),
             style = MaterialTheme.typography.labelSmall,
             color = WeatherColors.OnBgTertiary
         )
