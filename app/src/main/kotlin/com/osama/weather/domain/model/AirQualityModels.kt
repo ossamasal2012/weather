@@ -3,6 +3,8 @@ package com.osama.weather.domain.model
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Color
 import com.osama.weather.R
+import com.osama.weather.util.DateTimeUtils
+import kotlin.math.abs
 
 data class AirQualityBundle(
     val latitude: Double,
@@ -11,8 +13,18 @@ data class AirQualityBundle(
     val utcOffsetSeconds: Int,
     val hourly: List<HourlyAirQualityEntry>
 ) {
-    /** The reading closest to "now" — used for the summary card on the home screen. */
-    val current: HourlyAirQualityEntry? get() = hourly.firstOrNull()
+    /**
+     * The reading closest to "now" — used for the summary card on the home
+     * screen and the Air Quality detail screen. [hourly] starts at local
+     * midnight, so this deliberately picks the entry nearest the current
+     * moment rather than the first one, which would always be 00:00's
+     * reading instead of the current air quality.
+     */
+    val current: HourlyAirQualityEntry?
+        get() {
+            val nowEpoch = DateTimeUtils.nowEpochSeconds()
+            return hourly.minByOrNull { abs(it.epochSeconds - nowEpoch) }
+        }
 }
 
 data class HourlyAirQualityEntry(
