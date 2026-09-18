@@ -20,7 +20,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -43,6 +42,12 @@ sealed interface UpdateDialogState {
     data class Downloading(val percent: Int) : UpdateDialogState
     data object Installing : UpdateDialogState
     data object Failed : UpdateDialogState
+
+    /** Result of a manual, user-initiated "check for updates" tap that found nothing new. */
+    data object UpToDate : UpdateDialogState
+
+    /** Result of a manual "check for updates" tap that couldn't reach the update server at all. */
+    data object CheckFailed : UpdateDialogState
 }
 
 /**
@@ -51,19 +56,28 @@ sealed interface UpdateDialogState {
  * outstanding, shows the real live download percentage once "تحديث الآن" is
  * tapped, and hands off to "جارٍ فتح شاشة التثبيت…" the moment the download
  * finishes.
+ *
+ * [UpdateDialogState.UpToDate] and [UpdateDialogState.CheckFailed] are the
+ * two purely-informational results of a manual check that found nothing to
+ * install — unlike every other state here they carry nothing to enforce, so
+ * they're the only ones that are freely dismissible (back press, tapping
+ * outside, or the "حسناً" button, via [onDismiss]).
  */
 @Composable
 fun UpdateDialog(
     state: UpdateDialogState,
     onUpdateNowClick: () -> Unit,
     onOpenInstallSettings: () -> Unit,
-    onRetryClick: () -> Unit
+    onRetryClick: () -> Unit,
+    onDismiss: () -> Unit = {}
 ) {
+    val dismissible = state is UpdateDialogState.UpToDate || state is UpdateDialogState.CheckFailed
+
     Dialog(
-        onDismissRequest = { /* intentionally not dismissible */ },
+        onDismissRequest = { if (dismissible) onDismiss() },
         properties = DialogProperties(
-            dismissOnBackPress = false,
-            dismissOnClickOutside = false
+            dismissOnBackPress = dismissible,
+            dismissOnClickOutside = dismissible
         )
     ) {
         Box(
@@ -75,8 +89,13 @@ fun UpdateDialog(
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                val title = when (state) {
+                    UpdateDialogState.UpToDate -> stringResource(R.string.update_up_to_date_title)
+                    UpdateDialogState.CheckFailed -> stringResource(R.string.update_check_failed_title)
+                    else -> stringResource(R.string.update_available_title)
+                }
                 Text(
-                    text = stringResource(R.string.update_available_title),
+                    text = title,
                     style = MaterialTheme.typography.headlineSmall,
                     color = WeatherColors.OnBgPrimary,
                     textAlign = TextAlign.Center
@@ -89,6 +108,8 @@ fun UpdateDialog(
                     is UpdateDialogState.Downloading -> stringResource(R.string.update_downloading_percent, state.percent)
                     UpdateDialogState.Installing -> stringResource(R.string.update_installing)
                     UpdateDialogState.Failed -> stringResource(R.string.update_download_failed)
+                    UpdateDialogState.UpToDate -> stringResource(R.string.settings_up_to_date)
+                    UpdateDialogState.CheckFailed -> stringResource(R.string.update_check_failed_message)
                 }
                 Text(
                     text = message,
@@ -120,6 +141,9 @@ fun UpdateDialog(
                     }
                     UpdateDialogState.Failed -> {
                         UpdateActionButton(stringResource(R.string.update_retry), onRetryClick)
+                    }
+                    UpdateDialogState.UpToDate, UpdateDialogState.CheckFailed -> {
+                        UpdateActionButton(stringResource(R.string.ok), onDismiss)
                     }
                 }
             }
