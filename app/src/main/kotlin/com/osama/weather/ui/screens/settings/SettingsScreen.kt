@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -46,7 +47,7 @@ import com.osama.weather.ui.theme.Spacing
 import com.osama.weather.ui.theme.WeatherColors
 
 @Composable
-fun SettingsScreen(homeViewModel: HomeViewModel, onBack: () -> Unit) {
+fun SettingsScreen(homeViewModel: HomeViewModel, onBack: () -> Unit, onPrivacyPolicyClick: () -> Unit) {
     val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
 
     Box(modifier = Modifier.fillMaxSize().background(WeatherColors.BrandDeepBlue)) {
@@ -106,7 +107,12 @@ fun SettingsScreen(homeViewModel: HomeViewModel, onBack: () -> Unit) {
                     text = stringResource(R.string.settings_check_updates),
                     style = MaterialTheme.typography.bodyMedium,
                     color = WeatherColors.Accent,
-                    modifier = Modifier.clickable { homeViewModel.checkForUpdate() }
+                    modifier = Modifier.clickable { homeViewModel.checkForUpdate(showResultIfNoUpdate = true) }
+                )
+                Spacer(modifier = Modifier.height(Spacing.sm))
+                NavigationRow(
+                    label = stringResource(R.string.settings_privacy_policy),
+                    onClick = onPrivacyPolicyClick
                 )
             }
 
@@ -147,5 +153,27 @@ private fun InfoRow(label: String, value: String) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         Text(label, style = MaterialTheme.typography.bodyMedium, color = WeatherColors.OnBgSecondary)
         Text(value, style = MaterialTheme.typography.bodyMedium, color = WeatherColors.OnBgPrimary)
+    }
+}
+
+/** A settings row that navigates to another screen (Privacy Policy): a label plus a trailing chevron. */
+@Composable
+private fun NavigationRow(label: String, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(Radius.sm))
+            .clickable(onClick = onClick)
+            .padding(vertical = Spacing.xxs),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(label, style = MaterialTheme.typography.bodyMedium, color = WeatherColors.Accent)
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+            contentDescription = null,
+            tint = WeatherColors.OnBgTertiary,
+            modifier = Modifier.height(18.dp)
+        )
     }
 }
