@@ -32,17 +32,25 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.osama.weather.R
 import com.osama.weather.domain.model.HourlyEntry
+import com.osama.weather.domain.model.closestTo
 import com.osama.weather.ui.components.GlassCard
 import com.osama.weather.ui.screens.home.HomeViewModel
 import com.osama.weather.ui.theme.Spacing
 import com.osama.weather.ui.theme.WeatherColors
+import com.osama.weather.util.DateTimeUtils
+import com.osama.weather.util.NumberFormatters
 import com.osama.weather.util.UnitConverters
 
 @Composable
 fun AdvancedDetailsScreen(homeViewModel: HomeViewModel, onBack: () -> Unit) {
     val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
     val weather = uiState.weather
-    val now: HourlyEntry? = weather?.hourly?.firstOrNull()
+    // weather.hourly starts at local midnight, so .firstOrNull() would be
+    // midnight's reading, not "now" — every value on this screen needs the
+    // entry closest to the current moment instead.
+    val now: HourlyEntry? = weather?.let { w ->
+        w.hourly.closestTo(DateTimeUtils.parseEpochSeconds(w.current.time, w.utcOffsetSeconds))
+    }
     val tempUnit = uiState.temperatureUnit
     val unitSuffix = UnitConverters.temperatureSuffix(tempUnit)
 
@@ -78,9 +86,9 @@ fun AdvancedDetailsScreen(homeViewModel: HomeViewModel, onBack: () -> Unit) {
             }
 
             SectionCard(title = stringResource(R.string.section_atmosphere)) {
-                DetailLine(stringResource(R.string.dew_point), "${UnitConverters.temperature(now.dewPoint, tempUnit).let { kotlin.math.round(it).toInt() }}$unitSuffix")
+                DetailLine(stringResource(R.string.dew_point), NumberFormatters.signedTemp(UnitConverters.temperature(now.dewPoint, tempUnit), unitSuffix))
                 DetailLine(stringResource(R.string.vapour_pressure_deficit), now.vapourPressureDeficit?.let { "%.2f kPa".format(it) } ?: "—")
-                DetailLine(stringResource(R.string.wet_bulb_temp), now.wetBulbTemperature?.let { "${UnitConverters.temperature(it, tempUnit).let { v -> kotlin.math.round(v).toInt() }}$unitSuffix" } ?: "—")
+                DetailLine(stringResource(R.string.wet_bulb_temp), now.wetBulbTemperature?.let { NumberFormatters.signedTemp(UnitConverters.temperature(it, tempUnit), unitSuffix) } ?: "—")
                 DetailLine(stringResource(R.string.total_water_vapour), now.totalColumnWaterVapour?.let { "%.1f kg/m²".format(it) } ?: "—")
                 DetailLine(stringResource(R.string.boundary_layer_height), now.boundaryLayerHeight?.let { "${it.toInt()} m" } ?: "—")
                 DetailLine(stringResource(R.string.freezing_level_height), now.freezingLevelHeight?.let { "${it.toInt()} m" } ?: "—")
@@ -108,10 +116,10 @@ fun AdvancedDetailsScreen(homeViewModel: HomeViewModel, onBack: () -> Unit) {
 
             SectionCard(title = stringResource(R.string.section_soil)) {
                 Text(stringResource(R.string.soil_temperature), style = MaterialTheme.typography.labelLarge, color = WeatherColors.OnBgTertiary)
-                now.soilTemperature0cm?.let { DetailLine(stringResource(R.string.surface), "${UnitConverters.temperature(it, tempUnit).toInt()}$unitSuffix") }
-                now.soilTemperature6cm?.let { DetailLine(stringResource(R.string.depth_cm, 6), "${UnitConverters.temperature(it, tempUnit).toInt()}$unitSuffix") }
-                now.soilTemperature18cm?.let { DetailLine(stringResource(R.string.depth_cm, 18), "${UnitConverters.temperature(it, tempUnit).toInt()}$unitSuffix") }
-                now.soilTemperature54cm?.let { DetailLine(stringResource(R.string.depth_cm, 54), "${UnitConverters.temperature(it, tempUnit).toInt()}$unitSuffix") }
+                now.soilTemperature0cm?.let { DetailLine(stringResource(R.string.surface), NumberFormatters.signedTemp(UnitConverters.temperature(it, tempUnit), unitSuffix)) }
+                now.soilTemperature6cm?.let { DetailLine(stringResource(R.string.depth_cm, 6), NumberFormatters.signedTemp(UnitConverters.temperature(it, tempUnit), unitSuffix)) }
+                now.soilTemperature18cm?.let { DetailLine(stringResource(R.string.depth_cm, 18), NumberFormatters.signedTemp(UnitConverters.temperature(it, tempUnit), unitSuffix)) }
+                now.soilTemperature54cm?.let { DetailLine(stringResource(R.string.depth_cm, 54), NumberFormatters.signedTemp(UnitConverters.temperature(it, tempUnit), unitSuffix)) }
                 Spacer(modifier = Modifier.height(Spacing.xs))
                 Text(stringResource(R.string.soil_moisture), style = MaterialTheme.typography.labelLarge, color = WeatherColors.OnBgTertiary)
                 now.soilMoisture0to1cm?.let { DetailLine("0-1 سم", "%.2f m³/m³".format(it)) }
