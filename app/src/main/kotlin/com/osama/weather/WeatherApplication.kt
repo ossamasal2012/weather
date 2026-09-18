@@ -30,9 +30,12 @@ class WeatherApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        // Lives for the whole process lifetime so a download that completes
-        // while the app is merely backgrounded (not killed) still triggers
-        // an immediate install, per the update-system brief.
-        updateDownloadManager.startListeningForCompletion()
+        if (BuildConfig.SELF_UPDATE_ENABLED) {
+            // Lives for the whole process lifetime so a download that completes
+            // while the app is merely backgrounded (not killed) still triggers
+            // an immediate install, per the update-system brief. Only exists in
+            // the "github" flavor — see BuildConfig.SELF_UPDATE_ENABLED.
+            updateDownloadManager.startListeningForCompletion()
+        }
     }
 }
