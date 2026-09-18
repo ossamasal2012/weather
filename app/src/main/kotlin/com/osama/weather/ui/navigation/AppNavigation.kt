@@ -17,6 +17,7 @@ import com.osama.weather.ui.screens.airquality.AirQualityScreen
 import com.osama.weather.ui.screens.details.AdvancedDetailsScreen
 import com.osama.weather.ui.screens.home.HomeScreen
 import com.osama.weather.ui.screens.home.HomeViewModel
+import com.osama.weather.ui.screens.privacy.PrivacyPolicyScreen
 import com.osama.weather.ui.screens.search.SearchScreen
 import com.osama.weather.ui.screens.search.SearchViewModel
 import com.osama.weather.ui.screens.settings.SettingsScreen
@@ -27,6 +28,7 @@ private object Routes {
     const val AIR_QUALITY = "air_quality"
     const val ADVANCED_DETAILS = "advanced_details"
     const val SETTINGS = "settings"
+    const val PRIVACY_POLICY = "privacy_policy"
 }
 
 @Composable
@@ -100,7 +102,21 @@ fun AppNavigation() {
             popEnterTransition = { fadeIn(tween(160)) },
             popExitTransition = { fadeOut(tween(200)) + slideOutVertically(tween(220), targetOffsetY = { it / 10 }) }
         ) {
-            SettingsScreen(homeViewModel = homeViewModel, onBack = { navController.popBackStack() })
+            SettingsScreen(
+                homeViewModel = homeViewModel,
+                onBack = { navController.popBackStack() },
+                onPrivacyPolicyClick = { navController.navigate(Routes.PRIVACY_POLICY) }
+            )
+        }
+
+        composable(
+            route = Routes.PRIVACY_POLICY,
+            enterTransition = { fadeIn(tween(220)) + slideInVertically(tween(260), initialOffsetY = { it / 10 }) },
+            exitTransition = { fadeOut(tween(160)) },
+            popEnterTransition = { fadeIn(tween(160)) },
+            popExitTransition = { fadeOut(tween(200)) + slideOutVertically(tween(220), targetOffsetY = { it / 10 }) }
+        ) {
+            PrivacyPolicyScreen(homeViewModel = homeViewModel, onBack = { navController.popBackStack() })
         }
     }
 }
