@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -137,6 +138,7 @@ private fun DailyRow(
             Box(
                 modifier = Modifier
                     .weight(1f)
+                    .padding(horizontal = Spacing.xs)
                     .height(5.dp)
                     .clip(RoundedCornerShape(50))
                     .background(
