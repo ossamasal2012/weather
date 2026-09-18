@@ -39,8 +39,8 @@ android {
         // Bump versionCode by exactly +1 on every release you push. See the
         // project README for the full release checklist.
         // ---------------------------------------------------------------------
-        versionCode = 4
-        versionName = "1.1.2"
+        versionCode = 5
+        versionName = "1.1.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
