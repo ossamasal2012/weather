@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Intent
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.osama.weather.BuildConfig
 import com.osama.weather.R
 import com.osama.weather.WeatherApplication
 import com.osama.weather.data.local.PrecipitationUnit
@@ -17,6 +18,7 @@ import com.osama.weather.ui.components.UpdateDialogState
 import com.osama.weather.update.DownloadStatus
 import com.osama.weather.update.model.UpdateCheckResult
 import com.osama.weather.update.model.VersionInfo
+import com.osama.weather.util.DateTimeUtils
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -49,6 +51,19 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private var pendingVersionInfo: VersionInfo? = null
 
+    // Cached snapshot of the last successful "my location" fetch — lets
+    // switching back to it (after viewing a searched city) restore instantly
+    // instead of repeating the GPS fix + reverse-geocode + weather/air-quality
+    // network round trips from scratch every single time.
+    private var currentLocationCache: CurrentLocationCache? = null
+
+    private data class CurrentLocationCache(
+        val location: GeoLocation,
+        val weather: WeatherBundle?,
+        val airQuality: AirQualityBundle?,
+        val cachedAtEpochSeconds: Long
+    )
+
     init {
         viewModelScope.launch { app.preferencesManager.temperatureUnit.collect { u -> _uiState.update { it.copy(temperatureUnit = u) } } }
         viewModelScope.launch { app.preferencesManager.windUnit.collect { u -> _uiState.update { it.copy(windUnit = u) } } }
@@ -56,9 +71,18 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch { app.preferencesManager.privacyPolicyLanguage.collect { l -> _uiState.update { it.copy(privacyPolicyLanguage = l) } } }
 
         loadInitialLocation()
-        checkForUpdate()
 
-        viewModelScope.launch { app.updateDownloadManager.checkPendingDownloadOnLaunch() }
+        // The self-update system (in-app "check for updates" + download +
+        // install flow) only exists in the "github" build flavor — see
+        // BuildConfig.SELF_UPDATE_ENABLED. The "uptodown" flavor ships none
+        // of this: that store has its own update mechanism, and an app that
+        // downloads + requests permission to install another APK is exactly
+        // the pattern malware scanners flag, even when — as here — it's
+        // entirely legitimate.
+        if (BuildConfig.SELF_UPDATE_ENABLED) {
+            checkForUpdate()
+            viewModelScope.launch { app.updateDownloadManager.checkPendingDownloadOnLaunch() }
+        }
     }
 
     // --------------------------------------------------------------- location
@@ -84,6 +108,27 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private suspend fun useCurrentLocationInternal() {
+        // Instant path: a recent successful "my location" fetch is already
+        // cached (typically from earlier this session) — restore it straight
+        // away with zero GPS/geocoding/network round trips, which is what
+        // makes switching back from a searched city feel instant.
+        val cache = currentLocationCache
+        val cacheIsFresh = cache != null &&
+            DateTimeUtils.nowEpochSeconds() - cache.cachedAtEpochSeconds < CURRENT_LOCATION_CACHE_TTL_SECONDS
+        if (cache != null && cacheIsFresh) {
+            _uiState.update {
+                it.copy(
+                    location = cache.location,
+                    weather = cache.weather,
+                    airQuality = cache.airQuality,
+                    isLoading = false,
+                    errorMessageRes = null
+                )
+            }
+            viewModelScope.launch { app.preferencesManager.saveLastLocation(cache.location) }
+            return
+        }
+
         val hadData = _uiState.value.weather != null
         if (!hadData) _uiState.update { it.copy(isLoading = true, errorMessageRes = null) }
 
@@ -117,7 +162,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             val weatherDeferred = async { app.weatherRepository.getWeather(location.latitude, location.longitude) }
             val airDeferred = async { app.airQualityRepository.getAirQuality(location.latitude, location.longitude) }
 
-            weatherDeferred.await()
+            val weatherResult = weatherDeferred.await()
+            weatherResult
                 .onSuccess { bundle -> _uiState.update { it.copy(weather = bundle, isLoading = false, errorMessageRes = null) } }
                 .onFailure {
                     _uiState.update { state ->
@@ -126,7 +172,23 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 }
 
             // Air quality is supplementary — a failure here never blocks the weather screen.
-            airDeferred.await().onSuccess { bundle -> _uiState.update { it.copy(airQuality = bundle) } }
+            val airResult = airDeferred.await()
+            airResult.onSuccess { bundle -> _uiState.update { it.copy(airQuality = bundle) } }
+
+            // Remember a successful "my location" fetch (not a searched
+            // city) so switching back to it later restores instantly — see
+            // useCurrentLocationInternal(). Only a genuinely fresh, successful
+            // weather fetch refreshes the cache; a failed refresh keeps
+            // whatever was cached before rather than pretending it's current.
+            val freshWeather = weatherResult.getOrNull()
+            if (location.isCurrentLocation && freshWeather != null) {
+                currentLocationCache = CurrentLocationCache(
+                    location = location,
+                    weather = freshWeather,
+                    airQuality = airResult.getOrNull() ?: currentLocationCache?.airQuality,
+                    cachedAtEpochSeconds = DateTimeUtils.nowEpochSeconds()
+                )
+            }
         }
     }
 
@@ -223,5 +285,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
         }
+    }
+
+    private companion object {
+        // Matches LocationHelper's own GPS-fix freshness window, for a
+        // consistent "how fresh is fresh enough" rule across the app's
+        // location-related caching.
+        const val CURRENT_LOCATION_CACHE_TTL_SECONDS = 5 * 60L
     }
 }
