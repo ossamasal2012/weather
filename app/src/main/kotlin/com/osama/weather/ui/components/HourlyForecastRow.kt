@@ -15,19 +15,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import com.osama.weather.R
+import com.osama.weather.data.local.TemperatureUnit
 import com.osama.weather.domain.model.HourlyEntry
 import com.osama.weather.domain.model.WeatherCodeMapper
 import com.osama.weather.ui.theme.Spacing
 import com.osama.weather.ui.theme.WeatherColors
 import com.osama.weather.util.DateTimeUtils
-import kotlin.math.roundToInt
+import com.osama.weather.util.NumberFormatters
+import com.osama.weather.util.UnitConverters
 
 @Composable
 fun HourlyForecastRow(
     hours: List<HourlyEntry>,
     utcOffsetSeconds: Int,
+    tempUnit: TemperatureUnit,
     unitSuffix: String,
     modifier: Modifier = Modifier
 ) {
@@ -44,14 +48,14 @@ fun HourlyForecastRow(
             contentPadding = PaddingValues(vertical = Spacing.xxs)
         ) {
             items(hours) { hour ->
-                HourlyItem(hour, utcOffsetSeconds, unitSuffix)
+                HourlyItem(hour, utcOffsetSeconds, tempUnit, unitSuffix)
             }
         }
     }
 }
 
 @Composable
-private fun HourlyItem(hour: HourlyEntry, utcOffsetSeconds: Int, unitSuffix: String) {
+private fun HourlyItem(hour: HourlyEntry, utcOffsetSeconds: Int, tempUnit: TemperatureUnit, unitSuffix: String) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.width(52.dp)
@@ -69,8 +73,8 @@ private fun HourlyItem(hour: HourlyEntry, utcOffsetSeconds: Int, unitSuffix: Str
         )
         androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(Spacing.xs))
         Text(
-            text = "${hour.temperature.roundToInt()}$unitSuffix",
-            style = MaterialTheme.typography.titleSmall,
+            text = NumberFormatters.signedTemp(UnitConverters.temperature(hour.temperature, tempUnit), unitSuffix),
+            style = MaterialTheme.typography.titleSmall.copy(textDirection = TextDirection.Ltr),
             color = WeatherColors.OnBgPrimary
         )
         if ((hour.precipitationProbability ?: 0) >= 15) {
