@@ -23,8 +23,6 @@
     <string name="cloud_cover">الغطاء السحابي</string>
     <string name="sunrise">الشروق</string>
     <string name="sunset">الغروب</string>
-    <string name="moonrise">شروق القمر</string>
-    <string name="moonset">غروب القمر</string>
     <string name="daylight_duration">مدة النهار</string>
     <string name="today">اليوم</string>
     <string name="tomorrow">غداً</string>
@@ -133,6 +131,10 @@
     <string name="update_retry">إعادة المحاولة</string>
     <string name="update_channel_name">تحديثات التطبيق</string>
     <string name="update_channel_description">إشعارات تنزيل وتثبيت تحديثات تطبيق الطقس</string>
+    <string name="update_up_to_date_title">لا يوجد تحديث</string>
+    <string name="update_check_failed_title">تعذّر التحقق</string>
+    <string name="update_check_failed_message">تعذّر التحقق من وجود تحديثات. يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.</string>
+    <string name="ok">حسناً</string>
 
     <!-- ===================== الإعدادات ===================== -->
     <string name="settings_units">الوحدات</string>
@@ -153,6 +155,9 @@
     <string name="settings_data_source_value">Open-Meteo.com</string>
     <string name="settings_check_updates">التحقق من وجود تحديثات</string>
     <string name="settings_up_to_date">التطبيق محدَّث لأحدث إصدار</string>
+    <string name="settings_privacy_policy">سياسة الخصوصية</string>
+    <string name="lang_toggle_arabic">العربية</string>
+    <string name="lang_toggle_english">English</string>
     <string name="copyright">جميع الحقوق محفوظة لتطبيق الطقس من المطوّر العراقي أسامة 🇮🇶</string>
 
     <!-- ===================== الأذونات والأخطاء ===================== -->
