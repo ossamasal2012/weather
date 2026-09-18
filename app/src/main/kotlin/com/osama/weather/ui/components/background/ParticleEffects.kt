@@ -228,7 +228,9 @@ fun MoonWithStars(modifier: Modifier = Modifier, phaseFraction: Float, starCount
         }
 
         // Real crescent/gibbous moon disc, positioned by the actual moon_phase fraction.
-        val moonRadius = size.minDimension * 0.11f
+        // Kept slightly smaller/thinner than a "full-weight" disc so it reads as
+        // delicate against the night sky rather than a bold, heavy circle.
+        val moonRadius = size.minDimension * 0.095f
         val moonCenter = Offset(size.width * 0.78f, size.height * 0.16f)
         drawCircle(
             brush = Brush.radialGradient(
