@@ -48,6 +48,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.osama.weather.R
 import com.osama.weather.domain.model.WeatherCodeMapper
 import com.osama.weather.domain.model.WeatherCondition
+import com.osama.weather.domain.model.closestTo
 import com.osama.weather.ui.components.CurrentWeatherHero
 import com.osama.weather.ui.components.DailyForecastList
 import com.osama.weather.ui.components.DetailStatCard
@@ -64,6 +65,7 @@ import com.osama.weather.ui.components.background.WeatherBackground
 import com.osama.weather.ui.theme.Spacing
 import com.osama.weather.ui.theme.WeatherColors
 import com.osama.weather.util.DateTimeUtils
+import com.osama.weather.util.NumberFormatters
 import com.osama.weather.util.UnitConverters
 import kotlin.math.roundToInt
 
@@ -190,10 +192,16 @@ fun HomeScreen(
                     val upcomingHours = weather.hourly
                         .filter { it.epochSeconds > nowEpoch }
                         .take(24)
+                    // "weather.hourly" starts at local midnight, so its first
+                    // entry is midnight's reading — this is the one to use
+                    // instead whenever a stat card means "right now" (UV
+                    // index, visibility, dew point below).
+                    val currentHourEntry = weather.hourly.closestTo(nowEpoch)
 
                     HourlyForecastRow(
                         hours = upcomingHours,
                         utcOffsetSeconds = weather.utcOffsetSeconds,
+                        tempUnit = tempUnit,
                         unitSuffix = unitSuffix
                     )
 
@@ -202,6 +210,7 @@ fun HomeScreen(
                     DailyForecastList(
                         days = weather.daily,
                         utcOffsetSeconds = weather.utcOffsetSeconds,
+                        tempUnit = tempUnit,
                         unitSuffix = unitSuffix
                     )
 
@@ -214,9 +223,7 @@ fun HomeScreen(
                             nowEpochSeconds = DateTimeUtils.parseEpochSeconds(weather.current.time, weather.utcOffsetSeconds),
                             sunriseEpochSeconds = DateTimeUtils.parseEpochSeconds(today.sunrise, weather.utcOffsetSeconds),
                             sunsetEpochSeconds = DateTimeUtils.parseEpochSeconds(today.sunset, weather.utcOffsetSeconds),
-                            moonPhaseFraction = today.moonPhase,
-                            moonriseIso = today.moonrise,
-                            moonsetIso = today.moonset
+                            moonPhaseFraction = today.moonPhase
                         )
                     }
 
@@ -253,7 +260,7 @@ fun HomeScreen(
                                 DetailStatCard(
                                     icon = Icons.Filled.Thermostat,
                                     label = stringResource(R.string.uv_index),
-                                    value = "${(weather.hourly.firstOrNull()?.uvIndex ?: 0.0).roundToInt()}"
+                                    value = "${(currentHourEntry?.uvIndex ?: 0.0).roundToInt()}"
                                 )
                             },
                             {
@@ -267,14 +274,17 @@ fun HomeScreen(
                                 DetailStatCard(
                                     icon = Icons.Filled.Visibility,
                                     label = stringResource(R.string.visibility),
-                                    value = "${(((weather.hourly.firstOrNull()?.visibility ?: 10000.0) / 1000.0)).roundToInt()} كم"
+                                    value = "${((currentHourEntry?.visibility ?: 10000.0) / 1000.0).roundToInt()} كم"
                                 )
                             },
                             {
                                 DetailStatCard(
                                     icon = Icons.Filled.Opacity,
                                     label = stringResource(R.string.dew_point),
-                                    value = "${UnitConverters.temperature(weather.hourly.firstOrNull()?.dewPoint ?: 0.0, tempUnit).roundToInt()}$unitSuffix"
+                                    value = NumberFormatters.signedTemp(
+                                        UnitConverters.temperature(currentHourEntry?.dewPoint ?: 0.0, tempUnit),
+                                        unitSuffix
+                                    )
                                 )
                             }
                         )
@@ -340,7 +350,8 @@ fun HomeScreen(
                 state = state,
                 onUpdateNowClick = { viewModel.onUpdateNowClick() },
                 onOpenInstallSettings = { installSettingsLauncher.launch(viewModel.installSettingsIntent()) },
-                onRetryClick = { viewModel.onRetryDownload() }
+                onRetryClick = { viewModel.onRetryDownload() },
+                onDismiss = { viewModel.dismissUpdateDialog() }
             )
         }
     }
