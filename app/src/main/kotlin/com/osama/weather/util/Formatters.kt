@@ -49,7 +49,7 @@ object DateTimeUtils {
         return "$hour12 $marker"
     }
 
-    /** "5:42 ص" — clock time with minutes, used for sunrise/sunset/moonrise/moonset. */
+    /** "5:42 ص" — clock time with minutes, used for sunrise/sunset. */
     fun clockTime(isoLocal: String): String = runCatching {
         val dt = LocalDateTime.parse(isoLocal)
         val hour24 = dt.hour
@@ -91,6 +91,12 @@ object DateTimeUtils {
         return "$dayName، ${dt.dayOfMonth} $month"
     }
 
+    /** "17/9" — compact day/month numeric date, shown next to each day in the forecast list. */
+    fun shortDayMonth(epochSeconds: Long, utcOffsetSeconds: Int): String {
+        val dt = toLocalDateTime(epochSeconds, utcOffsetSeconds)
+        return "${dt.dayOfMonth}/${dt.monthValue}"
+    }
+
     fun nowEpochSeconds(): Long = Instant.now().epochSecond
 
     fun isSameLocalDay(epochA: Long, epochB: Long, utcOffsetSeconds: Int): Boolean =
@@ -99,7 +105,25 @@ object DateTimeUtils {
 }
 
 object NumberFormatters {
-    fun roundedTemp(value: Double): String = "${value.roundToInt()}°"
+    /**
+     * "-2°" / "24°" — a rounded, signed temperature (or any signed value with
+     * a trailing unit symbol), wrapped in a Unicode left-to-right isolate
+     * (U+2066 … U+2069).
+     *
+     * Without this, a bare "-2°" has no strong-direction character at all —
+     * just a minus sign, digits, and a symbol, all "weak"/"neutral" under the
+     * Unicode Bidi Algorithm — so inside this app's RTL layout it falls back
+     * to the surrounding right-to-left paragraph and the minus sign gets
+     * reordered to the wrong side (rendering as "2°-" instead of "-2°").
+     * Isolating the run forces it to resolve as ordinary left-to-right
+     * digits — the only sensible reading for a signed number in either
+     * language — without affecting anything around it.
+     */
+    fun signedTemp(value: Double, suffix: String): String {
+        val rounded = value.roundToInt()
+        return "\u2066$rounded$suffix\u2069"
+    }
+
     fun roundedInt(value: Double): Int = value.roundToInt()
     fun percent(value: Int): String = "$value%"
     fun percent(value: Double): String = "${value.roundToInt()}%"
