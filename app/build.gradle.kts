@@ -39,11 +39,49 @@ android {
         // Bump versionCode by exactly +1 on every release you push. See the
         // project README for the full release checklist.
         // ---------------------------------------------------------------------
-        versionCode = 5
-        versionName = "1.1.3"
+        versionCode = 6
+        versionName = "1.1.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+    }
+
+    // ---------------------------------------------------------------------
+    // Two build flavors of the exact same app, same versionCode/versionName:
+    //
+    //  - "github"   → the full app, including the in-app self-update system
+    //                 (REQUEST_INSTALL_PACKAGES permission, the "check for
+    //                 updates" flow, download + install of new APKs). This is
+    //                 what gets published to the GitHub "latest" release and
+    //                 what existing installs update themselves to.
+    //  - "uptodown" → byte-for-byte the same weather app with the self-update
+    //                 system entirely switched off — not just hidden in the
+    //                 UI, but with BuildConfig.SELF_UPDATE_ENABLED = false
+    //                 gating every call site, AND the REQUEST_INSTALL_PACKAGES
+    //                 / POST_NOTIFICATIONS permissions stripped from the
+    //                 manifest (see src/uptodown/AndroidManifest.xml). Third-
+    //                 party stores scan every submitted APK for malware, and
+    //                 "downloads a file, then asks for permission to install
+    //                 it" is exactly the dropper pattern those scanners flag —
+    //                 even though here it's entirely legitimate. Uptodown has
+    //                 its own update mechanism for apps hosted there, so
+    //                 nothing is lost by leaving this out of that build.
+    //
+    // Both flavors keep the same applicationId (com.osama.weather) and the
+    // same release signing config, so a person could not have both installed
+    // side by side — they're two distribution channels for the same app, not
+    // two different apps.
+    // ---------------------------------------------------------------------
+    flavorDimensions += "distribution"
+    productFlavors {
+        create("github") {
+            dimension = "distribution"
+            buildConfigField("boolean", "SELF_UPDATE_ENABLED", "true")
+        }
+        create("uptodown") {
+            dimension = "distribution"
+            buildConfigField("boolean", "SELF_UPDATE_ENABLED", "false")
+        }
     }
 
     signingConfigs {
