@@ -73,13 +73,13 @@ jobs:
             echo "::warning::KEYSTORE_BASE64 secret is not set — the APK will fall back to DEBUG signing. See README.md > 'إعداد التوقيع' to configure the 4 required secrets."
           fi
 
-      - name: Build signed release APK
+      - name: Build signed release APKs (both flavors)
         env:
           KEYSTORE_FILE: ${{ runner.temp }}/release.keystore
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: ./gradlew assembleRelease --stacktrace
+        run: ./gradlew assembleGithubRelease assembleUptodownRelease --stacktrace
 
       - name: Read versionCode / versionName from app/build.gradle.kts
         id: version
@@ -97,7 +97,18 @@ jobs:
       - name: Stage release artifacts
         run: |
           mkdir -p release-assets
-          cp app/build/outputs/apk/release/app-release.apk release-assets/weather.apk
+
+          # "github" flavor — has the in-app self-update system. This is the
+          # file the app itself downloads, so its name must stay exactly
+          # "weather.apk" for the existing apk_url in version.json to keep
+          # working unchanged.
+          cp app/build/outputs/apk/github/release/app-github-release.apk release-assets/weather.apk
+
+          # "uptodown" flavor — same app, self-update system fully removed
+          # (see app/build.gradle.kts). This file is NOT auto-published
+          # anywhere; download it from this release's assets and upload it
+          # to the Uptodown Developer Console by hand, same as any update.
+          cp app/build/outputs/apk/uptodown/release/app-uptodown-release.apk release-assets/weather-uptodown.apk
 
           cat > release-assets/version.json << EOF
           {
@@ -111,6 +122,8 @@ jobs:
           EOF
           cat release-assets/version.json
 
+          echo "::notice title=Uptodown upload reminder::release-assets/weather-uptodown.apk is NOT uploaded anywhere automatically. Download it from this run's published release and upload it to your Uptodown Developer Console by hand."
+
       - name: Publish "latest" release (replaces the previous one automatically)
         uses: softprops/action-gh-release@v2
         with:
@@ -121,8 +134,12 @@ jobs:
             تحديث تلقائي منشور بواسطة GitHub Actions.
             هذا الإصدار يستبدل تلقائياً أي إصدار سابق بنفس الوسم `latest`،
             لذلك رابط التحديث داخل التطبيق يبقى ثابتاً دائماً.
+
+            **weather.apk** — النسخة الكاملة (تحتوي على نظام التحديث داخل التطبيق). هذه فقط للتحديث الذاتي للمستخدمين الحاليين، ولا تُرفع على المتاجر الخارجية.
+            **weather-uptodown.apk** — نفس التطبيق تماماً بدون نظام التحديث الذاتي، جاهزة للرفع يدوياً على Uptodown أو أي متجر آخر لا يحتاج هذه الميزة.
           files: |
             release-assets/weather.apk
+            release-assets/weather-uptodown.apk
             release-assets/version.json
           prerelease: false
           make_latest: true
