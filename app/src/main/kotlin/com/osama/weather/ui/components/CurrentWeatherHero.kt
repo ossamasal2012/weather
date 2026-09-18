@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.Dp
 import com.osama.weather.R
 import com.osama.weather.domain.model.DailyEntry
@@ -25,8 +26,8 @@ import com.osama.weather.ui.theme.ExtraTypography
 import com.osama.weather.ui.theme.Spacing
 import com.osama.weather.ui.theme.WeatherColors
 import com.osama.weather.util.DateTimeUtils
+import com.osama.weather.util.NumberFormatters
 import kotlinx.coroutines.delay
-import kotlin.math.roundToInt
 
 @Composable
 fun CurrentWeatherHero(
@@ -58,8 +59,15 @@ fun CurrentWeatherHero(
         Spacer(Spacing.xs)
 
         Text(
-            text = "${temperature.roundToInt()}$unitSuffix",
-            style = ExtraTypography.heroTemperature,
+            // A bare "-2°" has no strong-direction character (just a sign,
+            // digits, a symbol), so under this app's RTL layout it resolves
+            // against the ambient right-to-left paragraph and the minus
+            // sign lands on the wrong side unless it's isolated — see
+            // NumberFormatters.signedTemp. textDirection = Ltr on top is a
+            // second, redundant guard: this line is pure numerals/symbols
+            // with no Arabic mixed in, so forcing it costs nothing.
+            text = NumberFormatters.signedTemp(temperature, unitSuffix),
+            style = ExtraTypography.heroTemperature.copy(textDirection = TextDirection.Ltr),
             color = WeatherColors.OnBgPrimary,
             maxLines = 1
         )
@@ -77,15 +85,16 @@ fun CurrentWeatherHero(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = stringResource(R.string.feels_like) + " ${apparentTemperature.roundToInt()}$unitSuffix",
+                text = stringResource(R.string.feels_like) + " " + NumberFormatters.signedTemp(apparentTemperature, unitSuffix),
                 style = MaterialTheme.typography.bodyMedium,
                 color = WeatherColors.OnBgSecondary
             )
             if (today != null) {
                 Text("•", color = WeatherColors.OnBgTertiary)
                 Text(
-                    text = "${today.temperatureMax.roundToInt()}$unitSuffix / ${today.temperatureMin.roundToInt()}$unitSuffix",
-                    style = MaterialTheme.typography.bodyMedium,
+                    text = NumberFormatters.signedTemp(today.temperatureMax, unitSuffix) +
+                        " / " + NumberFormatters.signedTemp(today.temperatureMin, unitSuffix),
+                    style = MaterialTheme.typography.bodyMedium.copy(textDirection = TextDirection.Ltr),
                     color = WeatherColors.OnBgSecondary
                 )
             }
