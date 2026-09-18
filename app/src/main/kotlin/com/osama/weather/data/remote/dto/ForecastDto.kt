@@ -117,8 +117,6 @@ data class DailyDto(
     @SerialName("shortwave_radiation_sum") val shortwaveRadiationSum: List<Double?> = emptyList(),
     @SerialName("et0_fao_evapotranspiration") val et0FaoEvapotranspiration: List<Double?> = emptyList(),
     @SerialName("moon_phase") val moonPhase: List<Double?> = emptyList(),
-    val moonset: List<String?> = emptyList(),
-    val moonrise: List<String?> = emptyList(),
     @SerialName("sunshine_duration") val sunshineDuration: List<Double?> = emptyList(),
     @SerialName("daylight_duration") val daylightDuration: List<Double?> = emptyList(),
     val sunset: List<String?> = emptyList(),
