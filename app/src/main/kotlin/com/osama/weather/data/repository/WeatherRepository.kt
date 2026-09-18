@@ -133,8 +133,6 @@ class WeatherRepository(
                 shortwaveRadiationSum = shortwaveRadiationSum.at(i),
                 et0FaoEvapotranspiration = et0FaoEvapotranspiration.at(i),
                 moonPhase = moonPhase.at(i),
-                moonrise = moonrise.at(i),
-                moonset = moonset.at(i),
                 sunshineDuration = sunshineDuration.at(i),
                 daylightDuration = daylightDuration.at(i) ?: 0.0,
                 sunrise = sunrise.at(i) ?: "",
