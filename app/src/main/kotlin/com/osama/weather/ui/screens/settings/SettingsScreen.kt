@@ -102,13 +102,15 @@ fun SettingsScreen(homeViewModel: HomeViewModel, onBack: () -> Unit, onPrivacyPo
                 Spacer(modifier = Modifier.height(Spacing.sm))
                 InfoRow(stringResource(R.string.settings_version), BuildConfig.VERSION_NAME)
                 InfoRow(stringResource(R.string.settings_data_source), stringResource(R.string.settings_data_source_value))
-                Spacer(modifier = Modifier.height(Spacing.sm))
-                Text(
-                    text = stringResource(R.string.settings_check_updates),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = WeatherColors.Accent,
-                    modifier = Modifier.clickable { homeViewModel.checkForUpdate(showResultIfNoUpdate = true) }
-                )
+                if (BuildConfig.SELF_UPDATE_ENABLED) {
+                    Spacer(modifier = Modifier.height(Spacing.sm))
+                    Text(
+                        text = stringResource(R.string.settings_check_updates),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = WeatherColors.Accent,
+                        modifier = Modifier.clickable { homeViewModel.checkForUpdate(showResultIfNoUpdate = true) }
+                    )
+                }
                 Spacer(modifier = Modifier.height(Spacing.sm))
                 NavigationRow(
                     label = stringResource(R.string.settings_privacy_policy),
