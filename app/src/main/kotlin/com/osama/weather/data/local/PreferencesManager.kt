@@ -21,6 +21,9 @@ enum class TemperatureUnit(val apiSuffix: String) { CELSIUS("celsius"), FAHRENHE
 enum class WindUnit { KMH, MS, MPH, KNOTS }
 enum class PrecipitationUnit { MM, INCH }
 
+/** Which language body the Privacy Policy screen shows — defaults to Arabic for a person's very first visit. */
+enum class PrivacyPolicyLanguage { ARABIC, ENGLISH }
+
 class PreferencesManager(private val context: Context) {
 
     private object Keys {
@@ -32,6 +35,7 @@ class PreferencesManager(private val context: Context) {
         val PENDING_DOWNLOAD_ID = longPreferencesKey("pending_download_id")
         val PENDING_DOWNLOAD_VERSION_CODE = intPreferencesKey("pending_download_version_code")
         val LAST_SEEN_REMOTE_VERSION_CODE = intPreferencesKey("last_seen_remote_version_code")
+        val PRIVACY_POLICY_LANGUAGE = stringPreferencesKey("privacy_policy_language")
     }
 
     private val json = Json { ignoreUnknownKeys = true }
@@ -65,6 +69,22 @@ class PreferencesManager(private val context: Context) {
 
     suspend fun setPrecipitationUnit(unit: PrecipitationUnit) {
         context.dataStore.edit { it[Keys.PRECIP_UNIT] = unit.name }
+    }
+
+    // ------------------------------------------------------------- privacy
+
+    /**
+     * Persists across app restarts, however long the gap — once a person
+     * switches the Privacy Policy screen to English, it reopens in English
+     * every time after, until they switch it back themselves.
+     */
+    val privacyPolicyLanguage: Flow<PrivacyPolicyLanguage> = context.dataStore.data.map { prefs ->
+        runCatching { PrivacyPolicyLanguage.valueOf(prefs[Keys.PRIVACY_POLICY_LANGUAGE] ?: PrivacyPolicyLanguage.ARABIC.name) }
+            .getOrDefault(PrivacyPolicyLanguage.ARABIC)
+    }
+
+    suspend fun setPrivacyPolicyLanguage(language: PrivacyPolicyLanguage) {
+        context.dataStore.edit { it[Keys.PRIVACY_POLICY_LANGUAGE] = language.name }
     }
 
     // ------------------------------------------------------------- location
