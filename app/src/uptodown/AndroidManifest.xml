@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Flavor-specific manifest fragment for the "uptodown" build — merged on
+     top of src/main/AndroidManifest.xml automatically by the Android Gradle
+     Plugin (nothing to wire up manually).
+
+     This build has BuildConfig.SELF_UPDATE_ENABLED = false and never calls
+     any of the self-update code paths (see app/build.gradle.kts), so the two
+     permissions that code path needs are removed here rather than merely
+     going unused: a store's malware scan looks at the manifest, and an app
+     that declares REQUEST_INSTALL_PACKAGES alongside download logic reads as
+     a dropper pattern regardless of whether the code behind it ever runs.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Only needed to show the update-download progress notification —
+         this flavor never downloads an update, so never needs to show one. -->
+    <uses-permission
+        android:name="android.permission.POST_NOTIFICATIONS"
+        tools:node="remove" />
+
+    <!-- Only needed to launch the installer for a downloaded update APK —
+         this flavor never downloads or installs one. -->
+    <uses-permission
+        android:name="android.permission.REQUEST_INSTALL_PACKAGES"
+        tools:node="remove" />
+
+</manifest>
