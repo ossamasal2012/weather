@@ -19,7 +19,7 @@ class WeatherApiService {
         "weather_code", "temperature_2m_max", "temperature_2m_min", "apparent_temperature_max",
         "uv_index_max", "apparent_temperature_min", "uv_index_clear_sky_max", "wind_speed_10m_max",
         "wind_gusts_10m_max", "wind_direction_10m_dominant", "shortwave_radiation_sum",
-        "et0_fao_evapotranspiration", "moon_phase", "moonset", "moonrise", "sunshine_duration",
+        "et0_fao_evapotranspiration", "moon_phase", "sunshine_duration",
         "daylight_duration", "sunset", "sunrise", "precipitation_probability_max",
         "precipitation_hours", "precipitation_sum", "snowfall_sum", "showers_sum", "rain_sum"
     )
