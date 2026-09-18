@@ -106,6 +106,18 @@ data class HourlyEntry(
     val soilMoisture27to81cm: Double?
 )
 
+/**
+ * The hourly entry whose timestamp is nearest to [epochSeconds] — i.e. the
+ * best stand-in for "right now" from an hourly series. `weather.hourly`
+ * starts at local midnight, so its very first entry is midnight's reading,
+ * not the current hour's; picking the *closest* entry instead of
+ * `.firstOrNull()` is what makes "current" values (UV index, visibility, dew
+ * point, and everything on the Advanced Details screen) actually reflect the
+ * present moment rather than whatever conditions were at 00:00 that day.
+ */
+fun List<HourlyEntry>.closestTo(epochSeconds: Long): HourlyEntry? =
+    minByOrNull { kotlin.math.abs(it.epochSeconds - epochSeconds) }
+
 data class DailyEntry(
     val date: String,
     val weatherCode: Int,
@@ -121,8 +133,6 @@ data class DailyEntry(
     val shortwaveRadiationSum: Double?,
     val et0FaoEvapotranspiration: Double?,
     val moonPhase: Double?,
-    val moonrise: String?,
-    val moonset: String?,
     val sunshineDuration: Double?,
     val daylightDuration: Double,
     val sunrise: String,
