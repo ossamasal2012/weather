@@ -42,8 +42,6 @@ fun SunMoonCard(
     sunriseEpochSeconds: Long,
     sunsetEpochSeconds: Long,
     moonPhaseFraction: Double?,
-    moonriseIso: String?,
-    moonsetIso: String?,
     modifier: Modifier = Modifier
 ) {
     GlassCard(modifier = modifier.fillMaxWidth()) {
@@ -86,16 +84,6 @@ fun SunMoonCard(
                     style = MaterialTheme.typography.bodyMedium,
                     color = WeatherColors.OnBgPrimary,
                     modifier = Modifier.weight(1f)
-                )
-            }
-
-            if (moonriseIso != null || moonsetIso != null) {
-                Spacer(Modifier.height(Spacing.sm))
-                RiseSetRow(
-                    riseLabel = stringResource(R.string.moonrise),
-                    riseTime = moonriseIso?.let { DateTimeUtils.clockTime(it) } ?: "—",
-                    setLabel = stringResource(R.string.moonset),
-                    setTime = moonsetIso?.let { DateTimeUtils.clockTime(it) } ?: "—"
                 )
             }
         }
