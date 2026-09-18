@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.osama.weather.R
 import com.osama.weather.WeatherApplication
 import com.osama.weather.data.local.PrecipitationUnit
+import com.osama.weather.data.local.PrivacyPolicyLanguage
 import com.osama.weather.data.local.TemperatureUnit
 import com.osama.weather.data.local.WindUnit
 import com.osama.weather.domain.model.AirQualityBundle
@@ -32,7 +33,8 @@ data class HomeUiState(
     val temperatureUnit: TemperatureUnit = TemperatureUnit.CELSIUS,
     val windUnit: WindUnit = WindUnit.KMH,
     val precipitationUnit: PrecipitationUnit = PrecipitationUnit.MM,
-    val locationPermissionPermanentlyUnavailable: Boolean = false
+    val locationPermissionPermanentlyUnavailable: Boolean = false,
+    val privacyPolicyLanguage: PrivacyPolicyLanguage = PrivacyPolicyLanguage.ARABIC
 )
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
@@ -51,6 +53,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch { app.preferencesManager.temperatureUnit.collect { u -> _uiState.update { it.copy(temperatureUnit = u) } } }
         viewModelScope.launch { app.preferencesManager.windUnit.collect { u -> _uiState.update { it.copy(windUnit = u) } } }
         viewModelScope.launch { app.preferencesManager.precipitationUnit.collect { u -> _uiState.update { it.copy(precipitationUnit = u) } } }
+        viewModelScope.launch { app.preferencesManager.privacyPolicyLanguage.collect { l -> _uiState.update { it.copy(privacyPolicyLanguage = l) } } }
 
         loadInitialLocation()
         checkForUpdate()
@@ -149,18 +152,38 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch { app.preferencesManager.setPrecipitationUnit(unit) }
     }
 
+    fun setPrivacyPolicyLanguage(language: PrivacyPolicyLanguage) {
+        viewModelScope.launch { app.preferencesManager.setPrivacyPolicyLanguage(language) }
+    }
+
     // --------------------------------------------------------------- update
 
-    fun checkForUpdate() {
+    /**
+     * @param showResultIfNoUpdate Whether to surface a dialog even when there's
+     * nothing to install — true for the explicit "Check for Updates" tap in
+     * Settings (the person is waiting for an answer either way), false for the
+     * silent automatic check on every cold start (which should only ever
+     * interrupt the person when an update genuinely needs installing).
+     */
+    fun checkForUpdate(showResultIfNoUpdate: Boolean = false) {
         viewModelScope.launch {
             when (val result = app.updateManager.checkForUpdate()) {
                 is UpdateCheckResult.UpdateAvailable -> {
                     pendingVersionInfo = result.info
                     _updateState.value = UpdateDialogState.Available(result.info.versionName, result.info.forceUpdate)
                 }
-                else -> Unit // up to date, or check failed silently — never block access to the weather itself
+                is UpdateCheckResult.UpToDate -> {
+                    if (showResultIfNoUpdate) _updateState.value = UpdateDialogState.UpToDate
+                }
+                is UpdateCheckResult.Error -> {
+                    if (showResultIfNoUpdate) _updateState.value = UpdateDialogState.CheckFailed
+                }
             }
         }
+    }
+
+    fun dismissUpdateDialog() {
+        _updateState.value = null
     }
 
     fun onUpdateNowClick() {
